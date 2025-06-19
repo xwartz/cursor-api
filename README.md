@@ -1,4 +1,4 @@
-# Cursor API SDK
+# Cursor API
 
 [![npm version](https://badge.fury.io/js/cursor-api.svg)](https://badge.fury.io/js/cursor-api)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
@@ -36,7 +36,7 @@ const cursor = new Cursor({
 })
 
 const completion = await cursor.chat.completions.create({
-  model: 'gpt-4',
+  model: 'gpt-4o',
   messages: [{ role: 'user', content: 'Hello!' }],
 })
 ```
@@ -45,7 +45,7 @@ const completion = await cursor.chat.completions.create({
 
 ```typescript
 const stream = await cursor.chat.completions.create({
-  model: 'gpt-4',
+  model: 'gpt-4o',
   messages: [{ role: 'user', content: 'Tell me a story' }],
   stream: true,
 })
@@ -56,6 +56,14 @@ for await (const chunk of stream) {
 }
 ```
 
+## Supported Models
+
+| Model                                                   | Streaming | Description             |
+| ------------------------------------------------------- | --------- | ----------------------- |
+| `claude-4-sonnet`, `claude-3.7-sonnet`, `claude-4-opus` | ✅        | Anthropic Claude models |
+| `gpt-4.1`, `gpt-4o`, `gpt-4o-mini`                      | ✅        | OpenAI GPT models       |
+| `deepseek-r1`, `deepseek-v3`                            | ✅        | DeepSeek models         |
+
 ## Documentation
 
 - 📚 [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
@@ -65,54 +73,6 @@ for await (const chunk of stream) {
 - ❓ [FAQ](./docs/FAQ.md) - Frequently asked questions and troubleshooting
 - 🧪 [Verification Guide](./docs/VERIFICATION.md) - Testing and debugging tools
 - 👥 [Contributing](./CONTRIBUTING.md) - Development and contribution guidelines
-
-## Supported Models
-
-| Model                                                   | Streaming | Description             |
-| ------------------------------------------------------- | --------- | ----------------------- |
-| `claude-4-sonnet`, `claude-3.7-sonnet`, `claude-4-opus` | ✅         | Anthropic Claude models |
-| `gpt-4.1`, `gpt-4o`, `gpt-4o-mini`                      | ✅         | OpenAI GPT models       |
-| `deepseek-r1`, `deepseek-v3`                            | ✅         | DeepSeek models         |
-
-## Error Handling
-
-```typescript
-import { AuthenticationError, RateLimitError } from 'cursor-api';
-
-try {
-  const completion = await cursor.chat.completions.create({
-    model: 'gpt-4',
-    messages: [{ role: 'user', content: 'Hello' }],
-  });
-} catch (error) {
-  if (error instanceof AuthenticationError) {
-    console.error('Invalid credentials');
-  } else if (error instanceof RateLimitError) {
-    console.error('Rate limit exceeded');
-  }
-}
-```
-
-## Development
-
-```bash
-git clone https://github.com/xwartz/cursor-api.git
-cd cursor-api
-npm install
-npm run build
-npm test
-```
-
-**Requirements:**
-- Node.js 18+
-- TypeScript 5.6+
-- ESLint 9.0+ (flat config)
-
-**Key Scripts:**
-- `npm run build` - Build the project
-- `npm run test` - Run tests
-- `npm run lint` - Check code style
-- `npm run format` - Format code with Prettier
 
 ## Contributing
 
