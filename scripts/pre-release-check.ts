@@ -171,7 +171,20 @@ async function checkPackageContents(): Promise<void> {
 
   try {
     // Use npm pack to check package contents
-    const packOutput = execSync('npm pack --dry-run', { encoding: 'utf8' })
+    // We need to capture both stdout and stderr since npm notice goes to stderr
+    const packOutput = execSync('npm pack --dry-run 2>&1', {
+      encoding: 'utf8',
+    })
+
+    // Extract only the npm notice section
+    const noticeLines = packOutput
+      .split('\n')
+      .filter(
+        line =>
+          line.startsWith('npm notice') &&
+          (line.includes('kB') || line.includes('MB'))
+      )
+      .join('\n')
 
     // Check if required files are included
     const requiredFiles = [
@@ -184,12 +197,15 @@ async function checkPackageContents(): Promise<void> {
 
     for (const file of requiredFiles) {
       // Check if the file is listed in the npm pack output
-      // The output format is: "size filename"
+      // The output format is: "npm notice size filename"
       const filePattern = new RegExp(
-        `\\s${file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+        `npm notice\\s+[\\d\\.]+\\w+\\s+${file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
         'm'
       )
-      if (!filePattern.test(packOutput)) {
+
+      const found = filePattern.test(noticeLines)
+
+      if (!found) {
         throw new Error(`Required file missing from package: ${file}`)
       }
     }
