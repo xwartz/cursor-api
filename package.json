@@ -58,7 +58,7 @@
     "prerelease": "tsx scripts/pre-release-check.ts",
     "release": "semantic-release",
     "ci": "npm run lint && npm run type-check && npm run test:coverage && npm run build:verify",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "protobufjs": "^7.4.0",
