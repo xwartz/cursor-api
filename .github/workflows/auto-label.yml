@@ -1,0 +1,214 @@
+name: Auto Label PR
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  pull_request_target:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto Label PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo, number } = context.issue;
+
+            // Get PR details
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number
+            });
+
+            const title = pr.data.title.toLowerCase();
+            const body = pr.data.body ? pr.data.body.toLowerCase() : '';
+            const branch = pr.data.head.ref.toLowerCase();
+
+            // Get commits for additional context
+            const commits = await github.rest.pulls.listCommits({
+              owner,
+              repo,
+              pull_number: number
+            });
+
+            const commitMessages = commits.data
+              .map(commit => commit.commit.message.toLowerCase())
+              .join(' ');
+
+            const allText = `${title} ${body} ${branch} ${commitMessages}`;
+
+            // Define label rules
+            const labelRules = [
+              // Type labels
+              {
+                labels: ['🐛 bug'],
+                patterns: [/\b(bug|fix|bugfix|hotfix|patch|error|issue)\b/]
+              },
+              {
+                labels: ['✨ feature'],
+                patterns: [/\b(feat|feature|enhance)\b/]
+              },
+              {
+                labels: ['📚 docs'],
+                patterns: [/\b(doc|docs|documentation|readme|guide)\b/]
+              },
+              {
+                labels: ['🧹 chore'],
+                patterns: [/\b(chore|cleanup|refactor|style|format)\b/]
+              },
+              {
+                labels: ['🧪 test'],
+                patterns: [/\b(test|testing|spec|jest|coverage)\b/]
+              },
+              {
+                labels: ['🔧 ci/cd'],
+                patterns: [/\b(ci|cd|workflow|action|build|deploy|release)\b/]
+              },
+              {
+                labels: ['⚡ performance'],
+                patterns: [/\b(perf|performance|optimize|speed|fast)\b/]
+              },
+              {
+                labels: ['🔒 security'],
+                patterns: [/\b(security|vulnerability|auth|token|credential)\b/]
+              },
+
+              // Priority/Impact labels
+              {
+                labels: ['🚨 breaking change'],
+                patterns: [/\b(breaking|major|BREAKING CHANGE)\b/]
+              },
+              {
+                labels: ['🔥 critical'],
+                patterns: [/\b(critical|urgent|hotfix|emergency)\b/]
+              },
+              {
+                labels: ['📦 dependencies'],
+                patterns: [/\b(dep|deps|dependency|dependencies|package|npm|yarn)\b/]
+              },
+
+              // Component labels
+              {
+                labels: ['🎯 api'],
+                patterns: [/\b(api|endpoint|route|server|backend)\b/]
+              },
+              {
+                labels: ['🎨 ui/ux'],
+                patterns: [/\b(ui|ux|interface|frontend|design|style)\b/]
+              },
+              {
+                labels: ['🗄️ database'],
+                patterns: [/\b(db|database|sql|mongo|redis|migration)\b/]
+              },
+              {
+                labels: ['🔧 config'],
+                patterns: [/\b(config|configuration|settings|env|environment)\b/]
+              },
+
+              // Size labels based on file changes
+              {
+                labels: ['📝 small'],
+                condition: () => pr.data.additions + pr.data.deletions < 50
+              },
+              {
+                labels: ['📄 medium'],
+                condition: () => {
+                  const total = pr.data.additions + pr.data.deletions;
+                  return total >= 50 && total < 200;
+                }
+              },
+              {
+                labels: ['📚 large'],
+                condition: () => pr.data.additions + pr.data.deletions >= 200
+              }
+            ];
+
+            // Collect labels to add
+            const labelsToAdd = new Set();
+
+            for (const rule of labelRules) {
+              let shouldAddLabel = false;
+
+              // Check patterns
+              if (rule.patterns) {
+                shouldAddLabel = rule.patterns.some(pattern => pattern.test(allText));
+              }
+
+              // Check custom conditions
+              if (rule.condition) {
+                shouldAddLabel = rule.condition();
+              }
+
+              if (shouldAddLabel) {
+                rule.labels.forEach(label => labelsToAdd.add(label));
+              }
+            }
+
+            // Special handling for conventional commits
+            const conventionalPatterns = {
+              'feat': ['✨ feature'],
+              'fix': ['🐛 bug'],
+              'docs': ['📚 docs'],
+              'style': ['🧹 chore'],
+              'refactor': ['🧹 chore'],
+              'perf': ['⚡ performance'],
+              'test': ['🧪 test'],
+              'chore': ['🧹 chore'],
+              'ci': ['🔧 ci/cd'],
+              'build': ['🔧 ci/cd']
+            };
+
+            for (const [prefix, labels] of Object.entries(conventionalPatterns)) {
+              const pattern = new RegExp(`\\b${prefix}(\\([^)]+\\))?:\\s`, 'i');
+              if (pattern.test(allText)) {
+                labels.forEach(label => labelsToAdd.add(label));
+              }
+            }
+
+            // Get current labels
+            const currentLabels = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number: number
+            });
+
+            const currentLabelNames = new Set(currentLabels.data.map(label => label.name));
+
+            // Only add labels that don't already exist
+            const newLabels = Array.from(labelsToAdd).filter(label => !currentLabelNames.has(label));
+
+            if (newLabels.length > 0) {
+              console.log(`Adding labels: ${newLabels.join(', ')}`);
+
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: number,
+                labels: newLabels
+              });
+
+              // Comment on the PR about auto-labeling
+              const labelList = newLabels.map(label => `\`${label}\``).join(', ');
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: number,
+                body: `🤖 **Auto-labeled this PR with:** ${labelList}\n\n_This was done automatically based on the PR title, description, and commits._`
+              });
+            } else {
+              console.log('No new labels to add');
+            }
