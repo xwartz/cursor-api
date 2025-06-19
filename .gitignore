@@ -22,6 +22,7 @@ out/
 coverage/
 .nyc_output
 *.lcov
+.jest-cache/
 
 # Logs
 logs
