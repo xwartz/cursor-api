@@ -1,3 +1,16 @@
+# 1.0.0 (2025-06-19)
+
+
+### Bug Fixes
+
+* package contents check in pre-release script ([#3](https://github.com/xwartz/cursor-api/issues/3)) ([17f9184](https://github.com/xwartz/cursor-api/commit/17f9184aec1564184c1a2f48f61d6d78214df59a))
+* semantic-release GitHub permissions and configuration ([#4](https://github.com/xwartz/cursor-api/issues/4)) ([f0a05c4](https://github.com/xwartz/cursor-api/commit/f0a05c4df77f0188e447ceba5ca613615f71012d))
+
+
+### Features
+
+* complete TypeScript SDK for Cursor API with streaming support,multi-model compatibility, comprehensive testing, and production-ready developer experience ([#1](https://github.com/xwartz/cursor-api/issues/1)) ([3211e90](https://github.com/xwartz/cursor-api/commit/3211e9086fb9b4aca7a8f38c07ccd76a77a7b0c4))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
