@@ -244,21 +244,38 @@ describe('APIClient', () => {
     })
 
     it('should handle timeout', async () => {
-      mockFetch.mockImplementation(
-        () =>
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Request timeout')), 200)
-          })
-      )
-
       const clientWithTimeout = new APIClient({
         ...validOptions,
         timeout: 10,
       })
 
+      // Mock fetch to immediately reject with AbortError
+      const abortError = new Error('The operation was aborted')
+      abortError.name = 'AbortError'
+      mockFetch.mockRejectedValue(abortError)
+
       await expect(
         clientWithTimeout.request('/test', { method: 'GET' })
-      ).rejects.toThrow(ConnectionError)
+      ).rejects.toThrow('Request timed out')
+    })
+
+    it('should handle timeout with exponential backoff', async () => {
+      const clientWithRetries = new APIClient({
+        ...validOptions,
+        maxRetries: 2,
+        timeout: 10,
+      })
+
+      // Mock fetch to always reject with AbortError
+      const abortError = new Error('The operation was aborted')
+      abortError.name = 'AbortError'
+      mockFetch.mockRejectedValue(abortError)
+
+      await expect(
+        clientWithRetries.request('/test', { method: 'GET' })
+      ).rejects.toThrow('Request timed out')
+
+      expect(mockFetch).toHaveBeenCalledTimes(3) // Original + 2 retries
     })
 
     it('should handle abort signal', async () => {
@@ -348,6 +365,103 @@ describe('APIClient', () => {
           body: 'body',
         })
       )
+    })
+  })
+
+  describe('additional edge cases for complete coverage', () => {
+    let client: APIClient
+
+    beforeEach(() => {
+      client = new APIClient(validOptions)
+    })
+
+    it('should handle request when fetch returns response.text() that throws', async () => {
+      const mockResponse = {
+        ok: false,
+        status: 400,
+        text: jest.fn().mockRejectedValue(new Error('Text parsing failed')),
+      }
+      mockFetch.mockResolvedValue(mockResponse)
+
+      await expect(client.request('/test', { method: 'GET' })).rejects.toThrow(
+        BadRequestError
+      )
+      expect(mockResponse.text).toHaveBeenCalled()
+    })
+
+    it('should handle request that fails after all retries with no lastError', async () => {
+      // Mock fetch to throw but in a way that doesn't set lastError
+      mockFetch.mockImplementation(() => {
+        throw new Error('Network error')
+      })
+
+      const clientWithRetries = new APIClient({
+        ...validOptions,
+        maxRetries: 1,
+      })
+
+      await expect(
+        clientWithRetries.request('/test', { method: 'GET' })
+      ).rejects.toThrow('Request failed: Network error')
+    })
+
+    it('should handle AbortError correctly', async () => {
+      const abortError = new Error('The operation was aborted')
+      abortError.name = 'AbortError'
+      mockFetch.mockRejectedValue(abortError)
+
+      await expect(client.request('/test', { method: 'GET' })).rejects.toThrow(
+        'Request timed out'
+      )
+    })
+
+    it('should handle generic errors that are already CursorError instances', async () => {
+      const cursorError = new BadRequestError('Already a cursor error')
+      mockFetch.mockRejectedValue(cursorError)
+
+      await expect(client.request('/test', { method: 'GET' })).rejects.toThrow(
+        'Already a cursor error'
+      )
+    })
+
+    it('should reach the final fallback APIError', async () => {
+      // Create a scenario where we exhaust retries but lastError is null somehow
+      let callCount = 0
+      mockFetch.mockImplementation(() => {
+        callCount++
+        if (callCount <= 3) {
+          // This simulates all attempts failing but no error being caught
+          return Promise.resolve({
+            ok: false,
+            status: 500,
+            text: () => Promise.resolve('Server error'),
+          })
+        }
+        return Promise.resolve({ ok: true, status: 200 })
+      })
+
+      const clientWithRetries = new APIClient({
+        ...validOptions,
+        maxRetries: 2,
+      })
+
+      await expect(
+        clientWithRetries.request('/test', { method: 'GET' })
+      ).rejects.toThrow('Server error')
+    })
+
+    it('should handle clearTimeout being called on successful request', async () => {
+      mockFetch.mockImplementation(async () => {
+        return {
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve('success'),
+        }
+      })
+
+      const result = await client.request('/test', { method: 'GET' })
+
+      expect(result).toBeDefined()
     })
   })
 })

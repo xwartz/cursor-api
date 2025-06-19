@@ -991,4 +991,384 @@ describe('ChatCompletions', () => {
       streamingMock.processChunk.mockResolvedValue('processed chunk')
     })
   })
+
+  describe('Additional edge cases for comprehensive coverage', () => {
+    const validParams: ChatCompletionCreateParams = {
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: 'Hello' }],
+    }
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should handle text after user markers and assistant markers', async () => {
+      const responseAfterMarkers = `
+        <|END_USER|>
+        A
+        Actual response content here
+        <|BEGIN_ASSISTANT|>Assistant content<|END_ASSISTANT|>
+        Some additional text
+      `
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(responseAfterMarkers)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(result.choices[0]?.message.content).toBe('Assistant content')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+
+    it('should handle protobuf text with various control character combinations', async () => {
+      const protobufWithControls =
+        '\x0a\x08Hello\x10\x20\x0a\x05World\x0c\x1f\x7fTest'
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(protobufWithControls)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+
+    it('should handle protobuf text length validation edge cases', async () => {
+      // Create text that will trigger bounds checking
+      const problematicText = '\x0a\xff\x00Hello' // Large length with insufficient data
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(problematicText)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+
+    it('should handle gzip chunks with decompression fallback', async () => {
+      // Test scenario where combined gzip fails but individual processing succeeds
+      const gzipChunk1 = new Uint8Array([
+        0x01, 0x00, 0x00, 0x04, 0x1b, 0x1f, 0x8b, 0x08, 0x00, 0x01,
+      ])
+      const gzipChunk2 = new Uint8Array([
+        0x01, 0x00, 0x00, 0x04, 0x1b, 0x1f, 0x8b, 0x08, 0x00, 0x02,
+      ])
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({ done: false, value: gzipChunk1 })
+              .mockResolvedValueOnce({ done: false, value: gzipChunk2 })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(result).toBeDefined()
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+    })
+
+    it('should handle response text cleaning edge cases', async () => {
+      const textWithMultipleMarkers = `
+        Prefix text
+        <|END_USER|>
+        C
+        Main content
+        <|BEGIN_ASSISTANT|>Assistant<|END_ASSISTANT|>
+        {}
+        Additional text
+      `
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(textWithMultipleMarkers)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+
+    it('should handle very large protobuf character filtering', async () => {
+      // Create a long string with various control characters
+      const longText = Array.from({ length: 1000 }, (_, i) => {
+        const code = i % 256
+        return String.fromCharCode(code)
+      }).join('')
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(longText)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+
+    it('should handle mixed gzip and non-gzip chunks', async () => {
+      // Mix of gzip and regular chunks
+      const gzipChunk = new Uint8Array([
+        0x01, 0x00, 0x00, 0x04, 0x1b, 0x1f, 0x8b, 0x08, 0x00,
+      ])
+      const regularChunk = Buffer.from('Regular text content', 'utf-8')
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({ done: false, value: gzipChunk })
+              .mockResolvedValueOnce({ done: false, value: regularChunk })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(result).toBeDefined()
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+    })
+
+    it('should handle concurrent chunk processing errors', async () => {
+      // Test error handling during concurrent gzip processing
+      const problematicGzipChunk = new Uint8Array([
+        0x01, 0x00, 0x00, 0x04, 0x1b, 0x1f, 0x8b, 0x08, 0x00, 0xff, 0xff,
+      ])
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: problematicGzipChunk,
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(result).toBeDefined()
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+    })
+
+    it('should validate message role combinations', async () => {
+      const validCombinations = [
+        [{ role: 'system' as const, content: 'System' }],
+        [
+          { role: 'system' as const, content: 'System' },
+          { role: 'user' as const, content: 'User' },
+        ],
+        [
+          { role: 'user' as const, content: 'User' },
+          { role: 'assistant' as const, content: 'Assistant' },
+          { role: 'user' as const, content: 'User again' },
+        ],
+      ]
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest.fn().mockResolvedValue({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      for (const messages of validCombinations) {
+        await expect(
+          completions.create({ ...validParams, messages })
+        ).resolves.toBeDefined()
+      }
+    })
+
+    it('should handle validateParams with various invalid inputs', async () => {
+      const invalidCases = [
+        { ...validParams, messages: null as any },
+        { ...validParams, messages: 'invalid' as any },
+        { ...validParams, messages: [null] as any },
+        { ...validParams, messages: [{ role: null, content: 'test' }] as any },
+        { ...validParams, messages: [{ role: 'user', content: null }] as any },
+        { ...validParams, model: null as any },
+        { ...validParams, model: 123 as any },
+      ]
+
+      for (const invalidParams of invalidCases) {
+        await expect(completions.create(invalidParams)).rejects.toThrow()
+      }
+    })
+
+    it('should handle unusual but valid edge cases', async () => {
+      const edgeCaseParams = {
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user' as const,
+            content: '', // Empty content - should fail validation
+          },
+        ],
+      }
+
+      await expect(completions.create(edgeCaseParams)).rejects.toThrow(
+        'Each message must have role and content'
+      )
+    })
+
+    it('should handle 4-byte zero prefix chunks', async () => {
+      // Test chunks with 4-byte zero prefix (protobuf data)
+      const zeroPrefix = new Uint8Array([0x00, 0x00, 0x00, 0x00])
+      const protobufData = Buffer.from('test protobuf data', 'utf-8')
+      const chunkWithZeroPrefix = new Uint8Array([
+        ...zeroPrefix,
+        ...protobufData,
+      ])
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: chunkWithZeroPrefix,
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(result).toBeDefined()
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+    })
+
+    it('should handle cleanProtobufText boundary conditions', async () => {
+      // Test protobuf text with boundary conditions
+      const protobufWithBounds = '\x0a\x05hello\x10\x01test'
+
+      const streamingMock = require('../../../src/core/streaming')
+      streamingMock.processChunk.mockResolvedValueOnce(protobufWithBounds)
+
+      const mockResponse = {
+        body: {
+          getReader: jest.fn().mockReturnValue({
+            read: jest
+              .fn()
+              .mockResolvedValueOnce({
+                done: false,
+                value: Buffer.from('test', 'utf-8'),
+              })
+              .mockResolvedValueOnce({ done: true }),
+            releaseLock: jest.fn(),
+          }),
+        },
+      }
+      mockClient.post.mockResolvedValue(mockResponse as any)
+
+      const result = await completions.create(validParams)
+      expect(typeof result.choices[0]?.message.content).toBe('string')
+
+      // Reset mock
+      streamingMock.processChunk.mockResolvedValue('processed chunk')
+    })
+  })
 })

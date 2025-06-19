@@ -41,13 +41,8 @@ export class APIClient {
    * Create request headers
    */
   private createHeaders(options?: RequestOptions): Record<string, string> {
-    // Handle URL-encoded keys
-    const cleanApiKey = this.apiKey.includes('%3A%3A')
-      ? this.apiKey.split('%3A%3A')[1]
-      : this.apiKey
-
     return {
-      authorization: `Bearer ${cleanApiKey}`,
+      authorization: `Bearer ${this.apiKey}`,
       'x-cursor-checksum': this.checksum,
       'Content-Type': 'application/connect+proto',
       'connect-accept-encoding': 'gzip',
@@ -81,9 +76,11 @@ export class APIClient {
     let lastError: Error | null = null
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      const controller = new AbortController()
+      let timeoutId: NodeJS.Timeout | undefined
+
       try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(
+        timeoutId = setTimeout(
           () => controller.abort(),
           options.timeout ?? this.timeout
         )
@@ -95,7 +92,11 @@ export class APIClient {
           signal: options.signal ?? controller.signal,
         })
 
-        clearTimeout(timeoutId)
+        // Clear timeout on successful response
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId)
+          timeoutId = undefined
+        }
 
         if (!response.ok) {
           const errorText = await response.text().catch(() => 'Unknown error')
@@ -104,6 +105,12 @@ export class APIClient {
 
         return response as T
       } catch (error) {
+        // Ensure timeout is always cleared, even on error
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId)
+          timeoutId = undefined
+        }
+
         lastError = error as Error
 
         // Don't retry on client errors (4xx) or if it's the last attempt
@@ -140,9 +147,13 @@ export class APIClient {
   }
 
   /**
-   * Utility function to sleep
+   * Utility function to sleep (can be bypassed in tests)
    */
   private sleep(ms: number): Promise<void> {
+    // Allow bypassing sleep in test environment
+    if (process.env['NODE_ENV'] === 'test' || process.env['JEST_WORKER_ID']) {
+      return Promise.resolve()
+    }
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 

@@ -135,6 +135,21 @@ describe('Protobuf Utilities', () => {
       expect(result).toBeInstanceOf(Uint8Array)
       expect(result.length).toBeGreaterThan(0)
     })
+
+    it('should handle encodeChatMessage with null message instructions', () => {
+      const messageWithNullInstructions = {
+        messages: [{ content: 'test', role: 1, messageId: 'test-id' }],
+        instructions: null,
+        projectPath: 'test-path',
+        model: { name: 'test-model', empty: '' },
+        requestId: 'test-request',
+        summary: 'test-summary',
+        conversationId: 'test-conversation',
+      }
+
+      const result = encodeChatMessage(messageWithNullInstructions)
+      expect(result).toBeInstanceOf(Uint8Array)
+    })
   })
 
   describe('createHexMessage', () => {
@@ -399,6 +414,14 @@ describe('Protobuf Utilities', () => {
       // Should fallback to UTF-8 interpretation
       expect(typeof result).toBe('string')
     })
+
+    it('should cover processChunk fallback error handling', async () => {
+      // Create a chunk that will trigger the fallback error handling
+      const problematicChunk = new Uint8Array([0xfe, 0xff, 0xfd, 0xfc])
+
+      const result = await processChunk(problematicChunk)
+      expect(typeof result).toBe('string')
+    })
   })
 
   describe('integration tests', () => {
@@ -542,6 +565,239 @@ describe('Protobuf Utilities', () => {
       const result = encodeChatMessage(complexMessage)
       expect(result).toBeInstanceOf(Uint8Array)
       expect(result.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Additional coverage for edge cases', () => {
+    it('should handle generateRandomId with invalid dictionary type fallback', () => {
+      jest.spyOn(Math, 'random').mockReturnValue(0.5)
+
+      const result = generateRandomId({
+        size: 5,
+        dictType: 'invalid' as any, // Force invalid type
+      })
+
+      expect(result).toHaveLength(5)
+      // Should fallback to 'max' dictionary
+      expect(typeof result).toBe('string')
+
+      jest.restoreAllMocks()
+    })
+
+    it('should handle generateRandomId with empty custom dictionary', () => {
+      jest.spyOn(Math, 'random').mockReturnValue(0.5)
+
+      const result = generateRandomId({
+        size: 3,
+        customDict: '', // Empty custom dictionary
+      })
+
+      expect(result).toHaveLength(3)
+      // Should fallback to default behavior
+      expect(typeof result).toBe('string')
+
+      jest.restoreAllMocks()
+    })
+
+    it('should handle parseHexResponse with invalid hex length', () => {
+      // Hex string with odd length (invalid hex)
+      const invalidHex = '0000000007' + '0a0548656c6c6' // Missing last character
+
+      const result = parseHexResponse(invalidHex)
+
+      expect(result).toEqual([])
+    })
+
+    it('should handle parseHexResponse with corrupted length field', () => {
+      // Length field indicates more bytes than available
+      const corruptHex = 'ffffffff' + '0a0548656c6c6f' // Very large length
+
+      const result = parseHexResponse(corruptHex)
+
+      expect(result).toEqual([])
+    })
+
+    it('should handle processChunk with specific error scenarios', async () => {
+      // Test the specific error scenarios mentioned in the code
+      const chunkThatThrowsError = new Uint8Array([0xff, 0xfe, 0xfd])
+
+      // Mock parseHexResponse to throw an error
+      const originalParseHex =
+        require('../../src/lib/protobuf').parseHexResponse
+      const protobuf = require('../../src/lib/protobuf')
+      protobuf.parseHexResponse = jest.fn().mockImplementation(() => {
+        throw new Error('Hex parsing error')
+      })
+
+      const result = await processChunk(chunkThatThrowsError)
+
+      // Should fall back to cleaned UTF-8
+      expect(typeof result).toBe('string')
+
+      // Restore original function
+      protobuf.parseHexResponse = originalParseHex
+    })
+
+    it('should handle encodeChatMessage with all null values', () => {
+      const messageWithNulls = {
+        messages: null,
+        instructions: null,
+        projectPath: null,
+        model: null,
+        requestId: null,
+        summary: null,
+        conversationId: null,
+      }
+
+      const result = encodeChatMessage(messageWithNulls)
+
+      expect(result).toBeInstanceOf(Uint8Array)
+    })
+
+    it('should handle convertToCursorFormat with edge case model names', () => {
+      const messages: ChatMessage[] = [{ role: 'user', content: 'Test' }]
+      const edgeCaseModels = [
+        '',
+        'model-with-very-long-name-that-exceeds-normal-limits',
+        'model.with.dots',
+        'model_with_underscores',
+        'MODEL-WITH-CAPS',
+      ]
+
+      edgeCaseModels.forEach(model => {
+        const result = convertToCursorFormat(messages, model)
+        expect(result.model?.name).toBe(model)
+        expect(result.messages).toHaveLength(1)
+      })
+    })
+
+    it('should handle createHexMessage with very large message arrays', () => {
+      // Create a large array of messages
+      const largeMessageArray: ChatMessage[] = Array.from(
+        { length: 100 },
+        (_, i) => ({
+          role: 'user' as const,
+          content: `Message ${i} with some content`,
+        })
+      )
+
+      const result = createHexMessage(largeMessageArray, 'gpt-4o')
+
+      expect(result).toBeInstanceOf(Buffer)
+      expect(result.length).toBeGreaterThan(0)
+    })
+
+    it('should handle decodeResMessage with malformed protobuf', () => {
+      // Create a buffer that looks like protobuf but is malformed
+      const malformedBuffer = new Uint8Array([
+        0x08,
+        0x96,
+        0x01, // Field 1: varint 150
+        0x12,
+        0xff,
+        0xff, // Field 2: length-delimited with invalid length
+      ])
+
+      expect(() => {
+        decodeResMessage(malformedBuffer)
+      }).toThrow()
+    })
+
+    it('should handle parseHexResponse with partial message at end', () => {
+      // Valid message followed by incomplete message
+      const validHex = '0000000007' + '0a0548656c6c6f' // "Hello"
+      const partialHex = '0000000010' + '0a05' // Incomplete message
+      const hex = validHex + partialHex
+
+      const result = parseHexResponse(hex)
+
+      expect(result).toEqual(['Hello'])
+    })
+
+    it('should handle generateChecksum with extreme Math.random values', () => {
+      // Test with edge values for Math.random
+      let callCount = 0
+      jest.spyOn(Math, 'random').mockImplementation(() => {
+        const values = [0, 0.999999, 0.5, 0.1, 0.9]
+        return values[callCount++ % values.length] || 0
+      })
+
+      const checksum1 = generateChecksum()
+      const checksum2 = generateChecksum()
+
+      expect(checksum1.startsWith('zo')).toBe(true)
+      expect(checksum1.includes('/')).toBe(true)
+      expect(checksum2.startsWith('zo')).toBe(true)
+      expect(checksum2.includes('/')).toBe(true)
+      expect(checksum1).not.toBe(checksum2)
+
+      jest.restoreAllMocks()
+    })
+
+    it('should handle processChunk with zero-length chunks', async () => {
+      const emptyChunk = new Uint8Array(0)
+
+      const result = await processChunk(emptyChunk)
+
+      expect(result).toBe('')
+    })
+
+    it('should handle very specific protobuf encoding edge cases', () => {
+      const edgeCaseMessage = {
+        messages: [
+          {
+            content: '', // Empty content
+            role: 0, // Zero role
+            messageId: '', // Empty message ID
+          },
+          {
+            content: 'A'.repeat(10000), // Very long content
+            role: 999, // High role number
+            messageId: 'x'.repeat(1000), // Very long message ID
+          },
+        ],
+        instructions: {
+          instruction: '', // Empty instruction
+        },
+        projectPath: '', // Empty project path
+        model: {
+          name: '', // Empty model name
+          empty: '', // Empty field
+        },
+        requestId: '', // Empty request ID
+        summary: '', // Empty summary
+        conversationId: '', // Empty conversation ID
+      }
+
+      const result = encodeChatMessage(edgeCaseMessage)
+
+      expect(result).toBeInstanceOf(Uint8Array)
+      expect(result.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Specific uncovered line coverage', () => {
+    it('should handle encodeChatMessage with null message instructions', () => {
+      const messageWithNullInstructions = {
+        messages: [{ content: 'test', role: 1, messageId: 'test-id' }],
+        instructions: null,
+        projectPath: 'test-path',
+        model: { name: 'test-model', empty: '' },
+        requestId: 'test-request',
+        summary: 'test-summary',
+        conversationId: 'test-conversation',
+      }
+
+      const result = encodeChatMessage(messageWithNullInstructions)
+      expect(result).toBeInstanceOf(Uint8Array)
+    })
+
+    it('should cover processChunk fallback error handling', async () => {
+      // Create a chunk that will trigger the fallback error handling
+      const problematicChunk = new Uint8Array([0xfe, 0xff, 0xfd, 0xfc])
+
+      const result = await processChunk(problematicChunk)
+      expect(typeof result).toBe('string')
     })
   })
 })

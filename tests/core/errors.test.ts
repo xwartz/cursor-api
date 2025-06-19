@@ -240,4 +240,97 @@ describe('Error Classes', () => {
       expect(error.message).toBe('Request timed out')
     })
   })
+
+  describe('CursorError.fromError method', () => {
+    it('should create TimeoutError from timeout error', () => {
+      const timeoutError = new Error('Request timeout occurred')
+      const error = CursorError.fromError(timeoutError)
+
+      expect(error).toBeInstanceOf(TimeoutError)
+      expect(error.message).toBe('Request timeout occurred')
+    })
+
+    it('should create ConnectionError from network error', () => {
+      const networkError = new Error('Network connection failed')
+      const error = CursorError.fromError(networkError)
+
+      expect(error).toBeInstanceOf(ConnectionError)
+      expect(error.message).toBe('Network connection failed')
+      expect((error as ConnectionError).cause).toBe(networkError)
+    })
+
+    it('should create ConnectionError from fetch error', () => {
+      const fetchError = new Error('Fetch request failed')
+      const error = CursorError.fromError(fetchError)
+
+      expect(error).toBeInstanceOf(ConnectionError)
+      expect(error.message).toBe('Fetch request failed')
+      expect((error as ConnectionError).cause).toBe(fetchError)
+    })
+
+    it('should create ConnectionError from abort error', () => {
+      const abortError = new Error('Operation was aborted')
+      const error = CursorError.fromError(abortError)
+
+      expect(error).toBeInstanceOf(ConnectionError)
+      expect(error.message).toBe('Operation was aborted')
+      expect((error as ConnectionError).cause).toBe(abortError)
+    })
+
+    it('should create APIError for generic errors', () => {
+      const genericError = new Error('Some random error')
+      const error = CursorError.fromError(genericError)
+
+      expect(error).toBeInstanceOf(APIError)
+      expect(error.message).toBe('Some random error')
+    })
+
+    it('should handle error with cause property', () => {
+      const originalError = new Error('Original error')
+      const error = CursorError.fromError(originalError)
+
+      expect(error).toBeInstanceOf(APIError)
+      // The cause property should be set if supported
+      if ('cause' in error) {
+        expect((error as any).cause).toBe(originalError)
+      }
+    })
+  })
+
+  describe('TimeoutError with timeout parameter', () => {
+    it('should create error with timeout value', () => {
+      const error = new TimeoutError('Custom timeout message', 5000)
+
+      expect(error.name).toBe('TimeoutError')
+      expect(error.message).toBe('Custom timeout message')
+      expect(error.timeout).toBe(5000)
+    })
+
+    it('should create error without timeout value', () => {
+      const error = new TimeoutError('No timeout value')
+
+      expect(error.name).toBe('TimeoutError')
+      expect(error.message).toBe('No timeout value')
+      expect(error.timeout).toBeUndefined()
+    })
+  })
+
+  describe('ConnectionError with cause parameter', () => {
+    it('should create error with cause', () => {
+      const cause = new Error('Root cause')
+      const error = new ConnectionError('Connection failed', cause)
+
+      expect(error.name).toBe('ConnectionError')
+      expect(error.message).toBe('Connection failed')
+      expect(error.cause).toBe(cause)
+    })
+
+    it('should create error without cause', () => {
+      const error = new ConnectionError('Connection failed')
+
+      expect(error.name).toBe('ConnectionError')
+      expect(error.message).toBe('Connection failed')
+      expect(error.cause).toBeUndefined()
+    })
+  })
 })
