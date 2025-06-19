@@ -183,7 +183,13 @@ async function checkPackageContents(): Promise<void> {
     ]
 
     for (const file of requiredFiles) {
-      if (!packOutput.includes(file)) {
+      // Check if the file is listed in the npm pack output
+      // The output format is: "size filename"
+      const filePattern = new RegExp(
+        `\\s${file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+        'm'
+      )
+      if (!filePattern.test(packOutput)) {
         throw new Error(`Required file missing from package: ${file}`)
       }
     }
