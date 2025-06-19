@@ -54,11 +54,11 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
     "type-check": "tsc --noEmit",
-    "prepare": "husky install",
     "prepublishOnly": "npm run build:verify && npm run test:all",
     "prerelease": "tsx scripts/pre-release-check.ts",
     "release": "semantic-release",
-    "ci": "npm run lint && npm run type-check && npm run test:coverage && npm run build:verify"
+    "ci": "npm run lint && npm run type-check && npm run test:coverage && npm run build:verify",
+    "prepare": "husky"
   },
   "dependencies": {
     "protobufjs": "^7.4.0",
