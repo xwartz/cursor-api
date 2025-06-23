@@ -19,14 +19,14 @@ pnpm add cursor-api
 
 ## Authentication
 
-To use the Cursor API, you need an authentication token and checksum. You can obtain these using the `cursor-cli` tool:
+To use the Cursor API, you need an authentication token and checksum. You can obtain these using the `cursor-tool` tool:
 
 ```bash
 # Install the CLI tool
-npm install -g cursor-cli
+npm install -g cursor-tool
 
 # Extract your token and checksum
-cursor-cli token
+cursor-tool token
 ```
 
 This will output your token and checksum, which you'll need to initialize the client.

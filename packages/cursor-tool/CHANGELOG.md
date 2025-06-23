@@ -1,4 +1,4 @@
-# cursor-cli
+# cursor-tool
 
 ## 2.0.0
 

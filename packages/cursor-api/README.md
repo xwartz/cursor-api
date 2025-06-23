@@ -51,14 +51,14 @@ main()
 
 ## Authentication
 
-To use the Cursor API, you need an authentication token and checksum. You can obtain these using the `cursor-cli` tool:
+To use the Cursor API, you need an authentication token and checksum. You can obtain these using the `cursor-tool` tool:
 
 ```bash
 # Install the CLI tool
-npm install -g cursor-cli
+npm install -g cursor-tool
 
 # Extract your token and checksum
-cursor-cli token
+cursor-tool token
 ```
 
 For more details, see the [Authentication Guide](./docs/AUTHENTICATION.md).

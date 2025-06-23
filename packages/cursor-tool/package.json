@@ -1,11 +1,11 @@
 {
-  "name": "cursor-cli",
+  "name": "cursor-tool",
   "version": "2.0.0",
   "description": "CLI tools for Cursor IDE",
   "author": "xwartz",
   "license": "MIT",
   "bin": {
-    "cursor-cli": "./bin/index.js"
+    "cursor-tool": "./bin/index.js"
   },
   "scripts": {
     "start": "tsx src/index.ts",
@@ -34,7 +34,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/xwartz/cursor-api",
-    "directory": "packages/cursor-cli"
+    "directory": "packages/cursor-tool"
   },
   "engines": {
     "node": ">=18.0.0"

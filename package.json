@@ -45,7 +45,7 @@
     "type-check": "pnpm -r type-check",
     "ci": "pnpm run lint && pnpm run type-check && pnpm run test:coverage && pnpm run build:verify",
     "prepare": "husky || true",
-    "get-token": "pnpm --filter=cursor-cli start -- token"
+    "get-token": "pnpm --filter=cursor-tool start -- token"
   },
   "devDependencies": {
     "@bufbuild/protobuf": "^2.5.2",
