@@ -27,6 +27,8 @@ jobs:
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
+      with:
+        version: 10
 
     - name: Install dependencies
       run: pnpm install
@@ -61,6 +63,8 @@ jobs:
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
+      with:
+        version: 9.5.0
 
     - name: Install dependencies
       run: pnpm install
@@ -91,6 +95,8 @@ jobs:
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
+      with:
+        version: 9.5.0
 
     - name: Download build artifacts
       uses: actions/download-artifact@v4

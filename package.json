@@ -49,6 +49,7 @@
     "get-token": "pnpm --filter=cursor-cli start -- token"
   },
   "devDependencies": {
+    "@bufbuild/protobuf": "^2.5.2",
     "@changesets/cli": "^2.29.5",
     "@types/jest": "^29.5.0",
     "@types/node": "^22.0.0",

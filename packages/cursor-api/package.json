@@ -45,7 +45,7 @@
     "type-check": "tsc --noEmit",
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --detectOpenHandles",
-    "test:coverage": "jest --coverage --detectOpenHandles",
+    "test:coverage": "jest --coverage --detectOpenHandles --selectProjects unit",
     "test:e2e": "jest --detectOpenHandles --selectProjects e2e",
     "test:unit": "jest --detectOpenHandles --selectProjects unit",
     "prerelease": "tsx scripts/pre-release-check.ts"

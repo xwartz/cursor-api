@@ -15,7 +15,9 @@ export interface ChatMessage {
   projectPath: string
   model: ChatMessage_Model | undefined
   requestId: string
+  /** 或许是空的，描述会话做了什么事情，但是不是标题 或许可以当作额外的设定来用 */
   summary: string
+  /** 又来一个uuid */
   conversationId: string
 }
 
