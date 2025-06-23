@@ -9,16 +9,16 @@ The Cursor API requires two authentication parameters:
 1. **API Key** (Token): A JWT token that authenticates your requests
 2. **Checksum**: A validation string that includes your machine identifiers
 
-## Using cursor-cli (Recommended)
+## Using cursor-tool (Recommended)
 
-The easiest way to get your authentication credentials is using the `cursor-cli` tool:
+The easiest way to get your authentication credentials is using the `cursor-tool` tool:
 
 ```bash
 # Install the CLI tool
-npm install -g cursor-cli
+npm install -g cursor-tool
 
 # Extract your token and checksum
-cursor-cli token
+cursor-tool token
 ```
 
 This will output your token and checksum, which you can use to initialize the API client.
@@ -105,7 +105,7 @@ const completion = await cursor.chat.completions.create({
 
 If you encounter authentication issues:
 
-1. **Token Expired**: Cursor tokens can expire. Extract a new token using `cursor-cli`.
+1. **Token Expired**: Cursor tokens can expire. Extract a new token using `cursor-tool`.
 2. **Invalid Checksum**: Make sure you're using the correct checksum that matches your machine IDs.
 3. **Network Issues**: Ensure your network allows connections to Cursor API endpoints.
 

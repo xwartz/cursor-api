@@ -1,4 +1,4 @@
-# Cursor CLI
+# Cursor Tool
 
 Command-line tools for Cursor IDE.
 
@@ -11,13 +11,13 @@ Command-line tools for Cursor IDE.
 ### Global Installation
 
 ```bash
-npm install -g cursor-cli
+npm install -g cursor-tool
 ```
 
 ### Local Installation
 
 ```bash
-npm install cursor-cli
+npm install cursor-tool
 ```
 
 ## Usage
@@ -26,16 +26,16 @@ npm install cursor-cli
 
 ```bash
 # If installed globally
-cursor-cli token
+cursor-tool token
 
 # If installed locally
-npx cursor-cli token
+npx cursor-tool token
 ```
 
 ### Programmatic Usage
 
 ```typescript
-import { getCursorTokenInfo } from 'cursor-cli'
+import { getCursorTokenInfo } from 'cursor-tool'
 
 const tokenInfo = getCursorTokenInfo()
 console.log(tokenInfo.token)

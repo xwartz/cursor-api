@@ -207,13 +207,13 @@ function tokenCommand() {
 function showHelp() {
   console.log('Cursor CLI - Command-line tools collection\n')
   console.log('Usage:')
-  console.log('  cursor-cli [command]')
+  console.log('  cursor-tool [command]')
   console.log('\nCommands:')
   console.log('  token       Extract Cursor Token information')
   console.log('  help        Show help information')
   console.log('\nExamples:')
-  console.log('  cursor-cli token')
-  console.log('  cursor-cli help')
+  console.log('  cursor-tool token')
+  console.log('  cursor-tool help')
 }
 
 /**

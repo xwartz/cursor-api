@@ -10,7 +10,7 @@ This repository contains TypeScript libraries and tools for working with the Cur
 This monorepo contains the following packages:
 
 - [`cursor-api`](./packages/cursor-api/README.md): TypeScript library for interacting with the Cursor API
-- [`cursor-cli`](./packages/cursor-cli/README.md): CLI tools for Cursor IDE
+- [`cursor-tool`](./packages/cursor-tool/README.md): CLI tools for Cursor IDE
 
 ## Getting Started
 
@@ -55,7 +55,7 @@ pnpm get-token
 cursor-api/
 ├── packages/
 │   ├── cursor-api/        # Main API library
-│   └── cursor-cli/        # CLI tools
+│   └── cursor-tool/        # CLI tools
 ├── e2e/                   # End-to-end tests
 └── .github/               # GitHub workflows
 ```
@@ -87,7 +87,7 @@ To manually publish packages:
 pnpm run release
 
 # Publish a specific package
-cd packages/cursor-cli
+cd packages/cursor-tool
 pnpm publish
 ```
 

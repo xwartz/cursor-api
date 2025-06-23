@@ -84,7 +84,7 @@ importers:
         specifier: ^11.0.3
         version: 11.1.0
 
-  packages/cursor-cli:
+  packages/cursor-tool:
     dependencies:
       better-sqlite3:
         specifier: ^11.1.2
