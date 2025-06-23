@@ -21,8 +21,11 @@
     "url": "https://github.com/xwartz/cursor-api"
   },
   "scripts": {
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
     "prerelease": "pnpm -r prerelease",
-    "release": "pnpm -r release",
+    "release": "pnpm build && pnpm changeset publish",
     "build": "pnpm -r build",
     "build:verify": "pnpm run build && pnpm run verify:build",
     "build:proto": "pnpm --filter=cursor-api build:proto",
@@ -46,8 +49,7 @@
     "get-token": "pnpm --filter=cursor-cli start -- token"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
+    "@changesets/cli": "^2.29.5",
     "@types/jest": "^29.5.0",
     "@types/node": "^22.0.0",
     "@types/semver": "^7.5.0",
@@ -60,7 +62,6 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.4.0",
     "protobufjs": "^7.4.0",
-    "semantic-release": "^24.0.0",
     "semver": "^7.6.0",
     "ts-jest": "^29.4.0",
     "ts-proto": "^2.0.0",

@@ -10,8 +10,7 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "build": "tsup src/index.ts --format cjs --out-dir bin --target node18 --minify --clean",
-    "type-check": "tsc --noEmit",
-    "release": "semantic-release"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "better-sqlite3": "^11.1.2"

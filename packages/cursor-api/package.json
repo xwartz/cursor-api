@@ -48,8 +48,7 @@
     "test:coverage": "jest --coverage --detectOpenHandles",
     "test:e2e": "jest --detectOpenHandles --selectProjects e2e",
     "test:unit": "jest --detectOpenHandles --selectProjects unit",
-    "prerelease": "tsx scripts/pre-release-check.ts",
-    "release": "semantic-release"
+    "prerelease": "tsx scripts/pre-release-check.ts"
   },
   "dependencies": {
     "protobufjs": "^7.4.0",
