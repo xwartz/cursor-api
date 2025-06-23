@@ -10,6 +10,7 @@ dist/
 build/
 .next/
 out/
+bin/
 
 # Environment variables
 .env

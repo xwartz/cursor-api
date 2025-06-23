@@ -16,7 +16,7 @@ Thank you for your interest in contributing to the Cursor API SDK! This document
 2. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Set up your credentials**
@@ -28,7 +28,7 @@ Thank you for your interest in contributing to the Cursor API SDK! This document
 
 4. **Run tests to ensure everything works**
    ```bash
-   npm test
+   pnpm test
    ```
 
 ### 2. Development Workflow
@@ -48,9 +48,9 @@ Thank you for your interest in contributing to the Cursor API SDK! This document
 3. **Test your changes**
 
    ```bash
-   npm run test
-   npm run type-check
-   npm run lint
+   pnpm run test
+   pnpm run type-check
+   pnpm run lint
    ```
 
 4. **Commit and push**
@@ -213,16 +213,16 @@ describe('New Feature', () => {
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Run tests with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # Run specific test file
-npm test -- new-feature.test.ts
+pnpm test -- new-feature.test.ts
 ```
 
 ## 📚 Documentation Guidelines
