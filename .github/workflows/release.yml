@@ -16,6 +16,8 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+      issues: write
+      repository-projects: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -43,6 +45,7 @@ jobs:
         with:
           # This will run `pnpm run release` if a release should be published
           publish: pnpm run release
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
