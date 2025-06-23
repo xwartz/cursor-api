@@ -2,7 +2,7 @@ const typescriptParser = require('@typescript-eslint/parser')
 
 module.exports = [
   {
-    files: ['src/**/*.ts', 'src/**/*.tsx', 'tests/**/*.ts'],
+    files: ['packages/**/**/*.ts', 'packages/**/**/*.tsx'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 2020,
@@ -33,6 +33,11 @@ module.exports = [
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'coverage/', 'eslint.config.js'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/coverage/**',
+      'eslint.config.js',
+    ],
   },
 ]

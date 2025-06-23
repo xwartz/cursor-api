@@ -24,13 +24,13 @@ Creates a new Cursor API client instance.
 
 | Option           | Type                     | Required | Default                  | Description                 |
 | ---------------- | ------------------------ | -------- | ------------------------ | --------------------------- |
-| `apiKey`         | `string`                 | ✅        | -                        | Cursor session token        |
-| `checksum`       | `string`                 | ✅        | -                        | Request validation checksum |
-| `baseURL`        | `string`                 | ❌        | `https://api2.cursor.sh` | API base URL                |
-| `timeout`        | `number`                 | ❌        | `60000`                  | Request timeout (ms)        |
-| `maxRetries`     | `number`                 | ❌        | `2`                      | Maximum retry attempts      |
-| `defaultHeaders` | `Record<string, string>` | ❌        | `{}`                     | Default request headers     |
-| `fetch`          | `typeof fetch`           | ❌        | `globalThis.fetch`       | Custom fetch implementation |
+| `apiKey`         | `string`                 | ✅       | -                        | Cursor session token        |
+| `checksum`       | `string`                 | ✅       | -                        | Request validation checksum |
+| `baseURL`        | `string`                 | ❌       | `https://api2.cursor.sh` | API base URL                |
+| `timeout`        | `number`                 | ❌       | `60000`                  | Request timeout (ms)        |
+| `maxRetries`     | `number`                 | ❌       | `2`                      | Maximum retry attempts      |
+| `defaultHeaders` | `Record<string, string>` | ❌       | `{}`                     | Default request headers     |
+| `fetch`          | `typeof fetch`           | ❌       | `globalThis.fetch`       | Custom fetch implementation |
 
 #### Example
 
@@ -43,8 +43,8 @@ const cursor = new Cursor({
   timeout: 30000,
   maxRetries: 3,
   defaultHeaders: {
-    'User-Agent': 'MyApp/1.0.0'
-  }
+    'User-Agent': 'MyApp/1.0.0',
+  },
 })
 ```
 
@@ -91,16 +91,16 @@ create(
 
 | Parameter           | Type                 | Required | Default | Description                 |
 | ------------------- | -------------------- | -------- | ------- | --------------------------- |
-| `model`             | `ChatModel`          | ✅        | -       | Model name to use           |
-| `messages`          | `ChatMessage[]`      | ✅        | -       | Conversation messages       |
-| `temperature`       | `number`             | ❌        | `1`     | Sampling temperature (0-2)  |
-| `max_tokens`        | `number`             | ❌        | -       | Maximum tokens to generate  |
-| `top_p`             | `number`             | ❌        | `1`     | Nucleus sampling parameter  |
-| `stream`            | `boolean`            | ❌        | `false` | Enable streaming            |
-| `presence_penalty`  | `number`             | ❌        | `0`     | Presence penalty (-2 to 2)  |
-| `frequency_penalty` | `number`             | ❌        | `0`     | Frequency penalty (-2 to 2) |
-| `user`              | `string`             | ❌        | -       | End-user identifier         |
-| `stop`              | `string \| string[]` | ❌        | -       | Stop sequences              |
+| `model`             | `ChatModel`          | ✅       | -       | Model name to use           |
+| `messages`          | `ChatMessage[]`      | ✅       | -       | Conversation messages       |
+| `temperature`       | `number`             | ❌       | `1`     | Sampling temperature (0-2)  |
+| `max_tokens`        | `number`             | ❌       | -       | Maximum tokens to generate  |
+| `top_p`             | `number`             | ❌       | `1`     | Nucleus sampling parameter  |
+| `stream`            | `boolean`            | ❌       | `false` | Enable streaming            |
+| `presence_penalty`  | `number`             | ❌       | `0`     | Presence penalty (-2 to 2)  |
+| `frequency_penalty` | `number`             | ❌       | `0`     | Frequency penalty (-2 to 2) |
+| `user`              | `string`             | ❌       | -       | End-user identifier         |
+| `stop`              | `string \| string[]` | ❌       | -       | Stop sequences              |
 
 #### Examples
 
@@ -111,7 +111,7 @@ const completion = await cursor.chat.completions.create({
   model: 'claude-4-sonnet',
   messages: [
     { role: 'system', content: 'You are a helpful assistant.' },
-    { role: 'user', content: 'Explain machine learning in simple terms' }
+    { role: 'user', content: 'Explain machine learning in simple terms' },
   ],
   temperature: 0.7,
   max_tokens: 500,
@@ -125,9 +125,7 @@ console.log(completion.choices[0].message.content)
 ```typescript
 const stream = await cursor.chat.completions.create({
   model: 'gpt-4o',
-  messages: [
-    { role: 'user', content: 'Write a short story' }
-  ],
+  messages: [{ role: 'user', content: 'Write a short story' }],
   stream: true,
   max_tokens: 1000,
 })
@@ -143,25 +141,28 @@ for await (const chunk of stream) {
 
 ##### Advanced Configuration
 
-```typescript
-const completion = await cursor.chat.completions.create({
-  model: 'claude-4-opus',
-  messages: [
-    { role: 'system', content: 'You are a code review assistant.' },
-    { role: 'user', content: 'Review this TypeScript function...' }
-  ],
-  temperature: 0.3,
-  max_tokens: 2000,
-  presence_penalty: 0.1,
-  frequency_penalty: 0.1,
-  stop: ['```', 'END_REVIEW'],
-}, {
-  timeout: 45000,
-  headers: {
-    'X-Request-ID': 'review-123'
+````typescript
+const completion = await cursor.chat.completions.create(
+  {
+    model: 'claude-4-opus',
+    messages: [
+      { role: 'system', content: 'You are a code review assistant.' },
+      { role: 'user', content: 'Review this TypeScript function...' },
+    ],
+    temperature: 0.3,
+    max_tokens: 2000,
+    presence_penalty: 0.1,
+    frequency_penalty: 0.1,
+    stop: ['```', 'END_REVIEW'],
+  },
+  {
+    timeout: 45000,
+    headers: {
+      'X-Request-ID': 'review-123',
+    },
   }
-})
-```
+)
+````
 
 ## Types
 
@@ -264,13 +265,13 @@ import {
   AuthenticationError,
   RateLimitError,
   BadRequestError,
-  TimeoutError
+  TimeoutError,
 } from 'cursor-api'
 
 try {
   const completion = await cursor.chat.completions.create({
     model: 'gpt-4',
-    messages: [{ role: 'user', content: 'Hello' }]
+    messages: [{ role: 'user', content: 'Hello' }],
   })
 } catch (error) {
   if (error instanceof AuthenticationError) {
@@ -297,9 +298,9 @@ try {
 
 ```typescript
 interface RequestOptions {
-  timeout?: number                    // Request timeout (ms)
-  headers?: Record<string, string>    // Additional headers
-  signal?: AbortSignal               // Abort signal
+  timeout?: number // Request timeout (ms)
+  headers?: Record<string, string> // Additional headers
+  signal?: AbortSignal // Abort signal
 }
 ```
 
@@ -308,26 +309,32 @@ interface RequestOptions {
 #### Custom Timeout
 
 ```typescript
-const completion = await cursor.chat.completions.create({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: 'Complex question...' }]
-}, {
-  timeout: 120000 // 2 minutes
-})
+const completion = await cursor.chat.completions.create(
+  {
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: 'Complex question...' }],
+  },
+  {
+    timeout: 120000, // 2 minutes
+  }
+)
 ```
 
 #### Custom Headers
 
 ```typescript
-const completion = await cursor.chat.completions.create({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: 'Hello' }]
-}, {
-  headers: {
-    'X-Request-ID': 'req-123',
-    'X-User-ID': 'user-456'
+const completion = await cursor.chat.completions.create(
+  {
+    model: 'gpt-4',
+    messages: [{ role: 'user', content: 'Hello' }],
+  },
+  {
+    headers: {
+      'X-Request-ID': 'req-123',
+      'X-User-ID': 'user-456',
+    },
   }
-})
+)
 ```
 
 #### Request Cancellation
@@ -339,12 +346,15 @@ const controller = new AbortController()
 setTimeout(() => controller.abort(), 30000)
 
 try {
-  const completion = await cursor.chat.completions.create({
-    model: 'gpt-4',
-    messages: [{ role: 'user', content: 'Long task...' }]
-  }, {
-    signal: controller.signal
-  })
+  const completion = await cursor.chat.completions.create(
+    {
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: 'Long task...' }],
+    },
+    {
+      signal: controller.signal,
+    }
+  )
 } catch (error) {
   if (error.name === 'AbortError') {
     console.log('Request was cancelled')
@@ -356,14 +366,14 @@ try {
 
 | Model               | Max Tokens | Streaming | Best For                     |
 | ------------------- | ---------- | --------- | ---------------------------- |
-| `claude-4-sonnet`   | 200,000    | ✅         | Advanced reasoning, analysis |
-| `claude-3.7-sonnet` | 200,000    | ✅         | Balanced performance         |
-| `claude-4-opus`     | 200,000    | ✅         | Most capable Claude model    |
-| `gpt-4.1`           | 128,000    | ✅         | Latest GPT-4 variant         |
-| `gpt-4o`            | 128,000    | ✅         | Optimized performance        |
-| `gpt-4o-mini`       | 128,000    | ✅         | Cost-effective tasks         |
-| `deepseek-r1`       | 65,536     | ✅         | Reasoning and mathematics    |
-| `deepseek-v3`       | 65,536     | ✅         | General purpose tasks        |
+| `claude-4-sonnet`   | 200,000    | ✅        | Advanced reasoning, analysis |
+| `claude-3.7-sonnet` | 200,000    | ✅        | Balanced performance         |
+| `claude-4-opus`     | 200,000    | ✅        | Most capable Claude model    |
+| `gpt-4.1`           | 128,000    | ✅        | Latest GPT-4 variant         |
+| `gpt-4o`            | 128,000    | ✅        | Optimized performance        |
+| `gpt-4o-mini`       | 128,000    | ✅        | Cost-effective tasks         |
+| `deepseek-r1`       | 65,536     | ✅        | Reasoning and mathematics    |
+| `deepseek-v3`       | 65,536     | ✅        | General purpose tasks        |
 
 ## Best Practices
 
@@ -373,13 +383,13 @@ try {
 // For code tasks
 const codeCompletion = await cursor.chat.completions.create({
   model: 'claude-4-opus',
-  messages: [{ role: 'user', content: 'Write a React component...' }]
+  messages: [{ role: 'user', content: 'Write a React component...' }],
 })
 
 // For reasoning tasks
 const reasoning = await cursor.chat.completions.create({
   model: 'deepseek-r1',
-  messages: [{ role: 'user', content: 'Solve this complex problem...' }]
+  messages: [{ role: 'user', content: 'Solve this complex problem...' }],
 })
 ```
 
@@ -391,7 +401,7 @@ if (expectedResponseLength > 100) {
   const stream = await cursor.chat.completions.create({
     model: 'gpt-4o',
     messages: messages,
-    stream: true
+    stream: true,
   })
 
   for await (const chunk of stream) {

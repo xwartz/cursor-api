@@ -91,10 +91,7 @@ type ApiResult<T> =
   | { success: false; error: string }
 
 // ✅ Good - String literal unions for constants
-type ChatModel =
-  | 'gpt-4'
-  | 'gpt-4-turbo'
-  | 'claude-3-5-sonnet-20241022'
+type ChatModel = 'gpt-4' | 'gpt-4-turbo' | 'claude-3-5-sonnet-20241022'
 
 // ❌ Avoid - Loose unions without discrimination
 type Result = Success | Error
@@ -122,7 +119,7 @@ async function createCompletion(
 }
 
 // ❌ Avoid - Inconsistent spacing
-const config={apiKey:key,timeout:30000}
+const config = { apiKey: key, timeout: 30000 }
 ```
 
 ### Line Length
@@ -142,7 +139,15 @@ const response = await this.client.chat.completions.create({
 })
 
 // ❌ Avoid - Long lines
-const response = await this.client.chat.completions.create({ model: 'gpt-4', messages: [{ role: 'system', content: 'You are a helpful assistant.' }, { role: 'user', content: userMessage }], temperature: 0.7, maxTokens: 1000 })
+const response = await this.client.chat.completions.create({
+  model: 'gpt-4',
+  messages: [
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: userMessage },
+  ],
+  temperature: 0.7,
+  maxTokens: 1000,
+})
 ```
 
 ### Object and Array Formatting
@@ -262,7 +267,7 @@ tests/integration/
 
 ### JSDoc Comments
 
-```typescript
+````typescript
 /**
  * Creates a chat completion using the specified parameters.
  *
@@ -288,7 +293,7 @@ async function createCompletion(
 ): Promise<ChatCompletion> {
   // implementation
 }
-```
+````
 
 ### Interface Documentation
 
@@ -316,7 +321,7 @@ interface ClientOptions {
 
 ### README Sections
 
-```markdown
+````markdown
 ## Feature Name
 
 Brief description of what this feature does.
@@ -327,6 +332,7 @@ Brief description of what this feature does.
 // Basic usage example
 const result = await feature.use()
 ```
+````
 
 ### Options
 
@@ -337,8 +343,10 @@ const result = await feature.use()
 ### Error Handling
 
 This feature can throw the following errors:
+
 - `SpecificError` - When specific condition occurs
-```
+
+````
 
 ## 🚨 Error Handling
 
@@ -368,7 +376,7 @@ export class AuthenticationError extends CursorApiError {
 
 // ❌ Avoid - Generic error throwing
 throw new Error('Something went wrong')
-```
+````
 
 ### Error Handling Patterns
 
@@ -449,8 +457,9 @@ describe('ChatCompletionClient', () => {
       mockApiClient.post.mockRejectedValue(new AuthenticationError())
 
       // Act & Assert
-      await expect(client.createCompletion(validParams))
-        .rejects.toThrow(AuthenticationError)
+      await expect(client.createCompletion(validParams)).rejects.toThrow(
+        AuthenticationError
+      )
     })
   })
 })
@@ -483,17 +492,21 @@ function createMockApiClient(): jest.Mocked<ApiClient> {
   } as jest.Mocked<ApiClient>
 }
 
-function createMockCompletion(overrides?: Partial<ChatCompletion>): ChatCompletion {
+function createMockCompletion(
+  overrides?: Partial<ChatCompletion>
+): ChatCompletion {
   return {
     id: 'test-completion-id',
     object: 'chat.completion',
     created: Date.now(),
     model: 'gpt-4',
-    choices: [{
-      index: 0,
-      message: { role: 'assistant', content: 'Test response' },
-      finish_reason: 'stop',
-    }],
+    choices: [
+      {
+        index: 0,
+        message: { role: 'assistant', content: 'Test response' },
+        finish_reason: 'stop',
+      },
+    ],
     usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
     ...overrides,
   }
@@ -562,11 +575,7 @@ export default class Cursor {
 // ✅ Good - Re-exports in index.ts
 export { Cursor } from './client'
 export type { ChatMessage, ChatCompletion } from './types/chat'
-export {
-  CursorError,
-  AuthenticationError,
-  RateLimitError,
-} from './core/errors'
+export { CursorError, AuthenticationError, RateLimitError } from './core/errors'
 ```
 
 ## 🔧 Configuration Files

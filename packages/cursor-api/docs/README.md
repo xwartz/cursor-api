@@ -25,15 +25,18 @@ Complete documentation for the Cursor API SDK, a TypeScript library for interact
 ## 🔍 Quick Navigation
 
 ### For New Users
+
 1. [Quick Start Guide](./QUICK_START.md) - Start here
 2. [Authentication Guide](./AUTHENTICATION.md) - Get your credentials
 3. [Usage Examples](./EXAMPLES.md) - See it in action
 
 ### For Developers
+
 2. [Contributing Guide](../CONTRIBUTING.md) - Start contributing
 3. [Code Style Guide](./CODE_STYLE.md) - Follow our standards
 
 ### For Troubleshooting
+
 1. [FAQ](./FAQ.md) - Common issues and solutions
 2. [Verification Guide](./VERIFICATION.md) - Debug your setup
 3. [Authentication Guide](./AUTHENTICATION.md) - Credential issues
@@ -86,8 +89,8 @@ Detailed guides and examples:
 
 ## 📝 Documentation Status
 
-| Document          | Status     | Last Updated |
-| ----------------- | ---------- | ------------ |
+| Document          | Status      | Last Updated |
+| ----------------- | ----------- | ------------ |
 | Quick Start       | ✅ Complete | Current      |
 | Authentication    | ✅ Complete | Current      |
 | API Reference     | ✅ Complete | Current      |

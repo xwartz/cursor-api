@@ -13,6 +13,7 @@ npm run debug
 ```
 
 **Expected Output:**
+
 ```
 ✅ Credentials loaded successfully
 🔗 Testing connection to api2.cursor.sh...
@@ -142,7 +143,10 @@ function detectProxy(): void {
   const activeProxies = proxyVars.filter(v => process.env[v])
 
   if (activeProxies.length > 0) {
-    console.log('🔍 Proxy detected:', activeProxies.map(v => `${v}=${process.env[v]}`))
+    console.log(
+      '🔍 Proxy detected:',
+      activeProxies.map(v => `${v}=${process.env[v]}`)
+    )
   } else {
     console.log('ℹ️  No proxy environment variables detected')
   }
@@ -164,7 +168,7 @@ async function testModels() {
     'gpt-4o-mini',
     'gpt-4',
     'claude-3-5-sonnet-20241022',
-    'claude-3-5-haiku-20241022'
+    'claude-3-5-haiku-20241022',
   ]
 
   for (const model of models) {
@@ -260,17 +264,23 @@ async function testRateLimit() {
 
   console.log('🔄 Testing rate limits (sending 5 rapid requests)...')
 
-  const promises = Array(5).fill(null).map((_, i) =>
-    cursor.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: `Request ${i + 1}` }],
-      max_tokens: 1,
-    }).catch(error => ({ error: error.message }))
-  )
+  const promises = Array(5)
+    .fill(null)
+    .map((_, i) =>
+      cursor.chat.completions
+        .create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: `Request ${i + 1}` }],
+          max_tokens: 1,
+        })
+        .catch(error => ({ error: error.message }))
+    )
 
   const results = await Promise.all(promises)
   const successful = results.filter(r => !('error' in r)).length
-  const rateLimited = results.filter(r => 'error' in r && r.error.includes('rate')).length
+  const rateLimited = results.filter(
+    r => 'error' in r && r.error.includes('rate')
+  ).length
 
   console.log(`✅ ${successful}/5 requests successful`)
   if (rateLimited > 0) {
@@ -309,12 +319,15 @@ async function testErrorHandling() {
       checksum: process.env.CURSOR_CHECKSUM!,
     })
 
-    await cursor.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: 'Test' }],
-    }, {
-      timeout: 1, // 1ms timeout to force failure
-    })
+    await cursor.chat.completions.create(
+      {
+        model: 'gpt-4',
+        messages: [{ role: 'user', content: 'Test' }],
+      },
+      {
+        timeout: 1, // 1ms timeout to force failure
+      }
+    )
   } catch (error) {
     console.log('✅ Timeout error handled correctly')
   }
@@ -328,7 +341,14 @@ async function healthCheck() {
   console.log('🏥 Running comprehensive health check...\n')
 
   const tests = [
-    { name: 'Credential Format', fn: () => validateCredentials(process.env.CURSOR_API_KEY!, process.env.CURSOR_CHECKSUM!) },
+    {
+      name: 'Credential Format',
+      fn: () =>
+        validateCredentials(
+          process.env.CURSOR_API_KEY!,
+          process.env.CURSOR_CHECKSUM!
+        ),
+    },
     { name: 'Network Connectivity', fn: testConnectivity },
     { name: 'Credential Freshness', fn: testCredentialFreshness },
     { name: 'Basic API Call', fn: verify },
@@ -373,7 +393,9 @@ function inspectEnvironment() {
   console.log(`Platform: ${process.platform}`)
   console.log(`Architecture: ${process.arch}`)
 
-  const hasCredentials = !!(process.env.CURSOR_API_KEY && process.env.CURSOR_CHECKSUM)
+  const hasCredentials = !!(
+    process.env.CURSOR_API_KEY && process.env.CURSOR_CHECKSUM
+  )
   console.log(`Credentials: ${hasCredentials ? '✅ Set' : '❌ Missing'}`)
 
   detectProxy()
@@ -395,9 +417,11 @@ function createDebugCursor() {
       const response = await fetch(url, options)
       const duration = Date.now() - start
 
-      console.log(`📥 ${response.status} ${response.statusText} (${duration}ms)`)
+      console.log(
+        `📥 ${response.status} ${response.statusText} (${duration}ms)`
+      )
       return response
-    }
+    },
   })
 }
 ```
@@ -425,4 +449,3 @@ npm run debug
 ```
 
 If any step fails, check the corresponding section in this guide for detailed troubleshooting.
-

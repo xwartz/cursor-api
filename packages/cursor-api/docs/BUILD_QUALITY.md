@@ -17,6 +17,7 @@ Ensure that each build:
 ### 1. Local Development Workflow
 
 #### Basic Build Verification
+
 ```bash
 # Build and verify
 npm run build:verify
@@ -27,6 +28,7 @@ npm run verify:build
 ```
 
 #### Run Integration Tests
+
 ```bash
 # Run build integration tests only
 npm run test:e2e
@@ -36,6 +38,7 @@ npm run test:all
 ```
 
 #### Complete Local Verification
+
 ```bash
 # Run complete CI workflow
 npm run ci
@@ -44,11 +47,13 @@ npm run ci
 ### 2. Pre-release Check
 
 #### Automated Pre-release Check
+
 ```bash
 npm run prerelease
 ```
 
 This command executes:
+
 - Git status check
 - Version number verification
 - Complete test suite
@@ -58,6 +63,7 @@ This command executes:
 - Documentation integrity verification
 
 #### Manual Release Check
+
 ```bash
 # Check package contents
 npm pack --dry-run
@@ -74,18 +80,21 @@ npx tsc --noEmit --skipLibCheck dist/index.d.ts
 ### Build Artifacts Verification
 
 #### File Integrity
+
 - [ ] `dist/index.js` (CommonJS version)
 - [ ] `dist/index.mjs` (ESM version)
 - [ ] `dist/index.d.ts` (TypeScript declaration file)
 - [ ] Reasonable build file sizes (< 5MB)
 
 #### Module Exports
+
 - [ ] CommonJS exports work correctly
 - [ ] ESM exports work correctly
 - [ ] Default export available
 - [ ] All error classes exported
 
 #### TypeScript Declarations
+
 - [ ] Syntax correct declaration files
 - [ ] Main types exported
 - [ ] Error types exported
@@ -94,18 +103,21 @@ npx tsc --noEmit --skipLibCheck dist/index.d.ts
 ### Runtime Verification
 
 #### Basic Functionality
+
 - [ ] Client instantiation successful
 - [ ] API methods accessible
 - [ ] Error handling working
 - [ ] Streaming functionality working
 
 #### Compatibility Tests
+
 - [ ] Works in Node.js 16+
 - [ ] CommonJS import works
 - [ ] ESM import works
 - [ ] TypeScript integration works
 
 #### Performance
+
 - [ ] Module load time < 1 second
 - [ ] Memory usage reasonable
 - [ ] No memory leaks
@@ -113,11 +125,13 @@ npx tsc --noEmit --skipLibCheck dist/index.d.ts
 ### External Integration
 
 #### Package Manager Compatibility
+
 - [ ] npm install works
 - [ ] yarn add works
 - [ ] pnpm add works
 
 #### Project Integration
+
 - [ ] Works in new ESM projects
 - [ ] Works in new CommonJS projects
 - [ ] Works in TypeScript projects
@@ -129,6 +143,7 @@ npx tsc --noEmit --skipLibCheck dist/index.d.ts
 
 **Problem**: Build file too large
 **Solution**:
+
 ```bash
 # Check bundle analysis
 npm run build:analyze
@@ -141,6 +156,7 @@ npm run verify:externals
 
 **Problem**: TypeScript compilation errors
 **Solution**:
+
 ```bash
 # Verify declaration files
 npx tsc --noEmit --skipLibCheck dist/index.d.ts
@@ -153,6 +169,7 @@ npm run verify:types
 
 **Problem**: Cannot resolve modules
 **Solution**:
+
 - Check external dependencies in package.json
 - Verify require/import statements
 - Test in clean environment
@@ -161,6 +178,7 @@ npm run verify:types
 
 **Problem**: Not working in specific environment
 **Solution**:
+
 ```bash
 # Test in different Node.js versions
 npm run test:compatibility
@@ -175,6 +193,7 @@ npm run test:esm
 ### GitHub Actions
 
 Our CI pipeline automatically runs:
+
 1. Linting and type checking
 2. Unit tests with coverage
 3. Build verification
@@ -184,6 +203,7 @@ Our CI pipeline automatically runs:
 ### Local Pre-commit
 
 Recommended pre-commit hook:
+
 ```bash
 #!/bin/sh
 npm run lint && npm run type-check && npm run test && npm run build:verify
@@ -192,16 +212,19 @@ npm run lint && npm run type-check && npm run test && npm run build:verify
 ## 📊 Quality Metrics
 
 ### Coverage Requirements
+
 - Unit test coverage: > 90%
 - Integration test coverage: > 80%
 - Type coverage: > 95%
 
 ### Performance Benchmarks
+
 - Module load time: < 1000ms
 - Memory usage: < 50MB
 - Build size: < 5MB
 
 ### Compatibility Matrix
+
 - Node.js: 16, 18, 20, 22
 - Module systems: CommonJS, ESM
 - TypeScript: 4.5+, 5.0+
@@ -209,6 +232,7 @@ npm run lint && npm run type-check && npm run test && npm run build:verify
 ## 🛠️ Tools and Scripts
 
 ### Available Commands
+
 ```bash
 # Build verification
 npm run build:verify
@@ -224,6 +248,7 @@ npm run prerelease
 ```
 
 ### Verification Scripts
+
 - `scripts/verify-build.ts` - Build artifacts verification
 - `scripts/pre-release-check.ts` - Comprehensive pre-release check
 - `tests/integration/build.test.ts` - Integration tests
@@ -231,11 +256,13 @@ npm run prerelease
 ## 🔍 Debugging Build Issues
 
 ### 1. Enable Verbose Logging
+
 ```bash
 DEBUG=* npm run build:verify
 ```
 
 ### 2. Check Build Output
+
 ```bash
 # Inspect build files
 ls -la dist/
@@ -246,6 +273,7 @@ du -h dist/*
 ```
 
 ### 3. Test Module Loading
+
 ```bash
 # Test CommonJS
 node -e "console.log(require('./dist/index.js'))"
@@ -255,6 +283,7 @@ node -e "import('./dist/index.mjs').then(console.log)"
 ```
 
 ### 4. Verify Dependencies
+
 ```bash
 # Check dependency resolution
 npm ls
@@ -267,12 +296,14 @@ npm pack && mkdir test && cd test && npm init -y && npm install ../package.tgz
 ## 📝 Documentation Requirements
 
 ### README Requirements
+
 - [ ] Installation instructions
 - [ ] Basic usage examples
 - [ ] API reference link
 - [ ] License information
 
 ### Code Documentation
+
 - [ ] JSDoc comments for public APIs
 - [ ] Type definitions for all exports
 - [ ] Example code snippets
@@ -283,6 +314,7 @@ npm pack && mkdir test && cd test && npm init -y && npm install ../package.tgz
 ## Summary
 
 This build quality assurance system ensures:
+
 - ✅ Reliable build artifacts
 - ✅ Cross-environment compatibility
 - ✅ Performance optimization

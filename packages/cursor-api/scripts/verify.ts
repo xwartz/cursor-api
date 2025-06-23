@@ -2,6 +2,8 @@
 
 import { Cursor } from '../src'
 import type { ChatCompletionChunk } from '../src/types/chat'
+import { execSync } from 'child_process'
+import { join } from 'path'
 
 interface VerificationResult {
   success: boolean
@@ -10,20 +12,63 @@ interface VerificationResult {
 }
 
 /**
+ * Get authentication credentials using cursor-cli
+ */
+function getCredentialsFromCli(): { apiKey: string; checksum: string } | null {
+  try {
+    console.log('🔑 Trying to get credentials from cursor-cli...')
+    // Get the path to the cursor-cli package
+    const cliPath = join(__dirname, '../../../packages/cursor-cli')
+
+    // Run the cursor-cli token command
+    const output = execSync('pnpm start -- token', {
+      cwd: cliPath,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      encoding: 'utf-8',
+    })
+
+    // Extract token and checksum from output
+    const tokenMatch = output.match(/Token: ([^\n]+)/)
+    const checksumMatch = output.match(/Checksum: ([^\n]+)/)
+
+    if (tokenMatch && checksumMatch) {
+      const apiKey = tokenMatch[1]?.trim() ?? ''
+      const checksum = checksumMatch[1]?.trim() ?? ''
+      console.log('✅ Successfully retrieved credentials from cursor-cli')
+      return { apiKey, checksum }
+    }
+
+    return null
+  } catch (error) {
+    console.error('❌ Failed to get credentials from cursor-cli:', error)
+    return null
+  }
+}
+
+/**
  * Verify Cursor API SDK functionality
  */
-
 async function verify(): Promise<void> {
-  const apiKey = process.env['CURSOR_API_KEY']
-  const checksum = process.env['CURSOR_CHECKSUM']
+  let apiKey = process.env['CURSOR_API_KEY']
+  let checksum = process.env['CURSOR_CHECKSUM']
+
+  // If environment variables are not set, try to get credentials from cursor-cli
+  if (!apiKey || !checksum) {
+    const credentials = getCredentialsFromCli()
+    if (credentials) {
+      apiKey = credentials.apiKey
+      checksum = credentials.checksum
+    }
+  }
 
   if (!apiKey) {
     console.error('❌ CURSOR_API_KEY environment variable not set')
     console.log('\n📋 To get your API key:')
-    console.log('1. Visit https://cursor.com and log in')
-    console.log('2. Open DevTools (F12) → Application → Cookies')
-    console.log('3. Find "WorkosCursorSessionToken" cookie')
-    console.log('4. Copy its value and set: export CURSOR_API_KEY="<token>"')
+    console.log('1. Install cursor-cli: npm install -g cursor-cli')
+    console.log('2. Run: cursor-cli token')
+    console.log('3. Set environment variables:')
+    console.log('   export CURSOR_API_KEY="<token>"')
+    console.log('   export CURSOR_CHECKSUM="<checksum>"')
     process.exit(1)
   }
 
@@ -211,7 +256,7 @@ async function verify(): Promise<void> {
   }
 }
 
-// 运行验证
+// Run verification
 if (require.main === module) {
   verify().catch((error: unknown) => {
     console.error('Verification failed:', error)
