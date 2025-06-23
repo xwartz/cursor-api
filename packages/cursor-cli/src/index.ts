@@ -184,21 +184,17 @@ function tokenCommand() {
 
     const tokenInfo = getCursorTokenInfo()
 
+    // Validate token format
+    if (!validateToken(tokenInfo.token)) {
+      console.log('❌ Token format validation failed')
+      process.exit(1)
+    }
+
     console.log('\n📋 Complete information:')
     console.log('=====================================')
     console.log(`Token: ${tokenInfo.token}`)
     console.log(`Checksum: ${tokenInfo.checksum}`)
     console.log('=====================================')
-
-    // Validate token format
-    if (validateToken(tokenInfo.token)) {
-      console.log('✅ Token format validation passed')
-    }
-
-    console.log('\n💡 Usage:')
-    console.log('Add the Token and Checksum to your tokens.json file')
-    console.log('Format: "token,checksum"')
-    console.log(`Example: "${tokenInfo.token},${tokenInfo.checksum}"`)
   } catch (error) {
     console.error('❌ Failed to get Token information:', error)
     process.exit(1)
