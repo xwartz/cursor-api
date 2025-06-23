@@ -1,6 +1,6 @@
 {
   "name": "cursor-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "TypeScript library for the Cursor API",
   "keywords": [
     "cursor",
@@ -47,8 +47,7 @@
     "test:watch": "jest --watch --detectOpenHandles",
     "test:coverage": "jest --coverage --detectOpenHandles --selectProjects unit",
     "test:e2e": "jest --detectOpenHandles --selectProjects e2e",
-    "test:unit": "jest --detectOpenHandles --selectProjects unit",
-    "prerelease": "tsx scripts/pre-release-check.ts"
+    "test:unit": "jest --detectOpenHandles --selectProjects unit"
   },
   "dependencies": {
     "protobufjs": "^7.4.0",

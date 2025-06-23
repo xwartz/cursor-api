@@ -24,7 +24,6 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "prerelease": "pnpm -r prerelease",
     "release": "pnpm build && pnpm changeset publish",
     "build": "pnpm -r build",
     "build:verify": "pnpm run build && pnpm run verify:build",

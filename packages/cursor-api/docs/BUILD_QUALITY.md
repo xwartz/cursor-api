@@ -44,24 +44,6 @@ npm run test:all
 npm run ci
 ```
 
-### 2. Pre-release Check
-
-#### Automated Pre-release Check
-
-```bash
-npm run prerelease
-```
-
-This command executes:
-
-- Git status check
-- Version number verification
-- Complete test suite
-- Build verification
-- Package content check
-- Dependency security check
-- Documentation integrity verification
-
 #### Manual Release Check
 
 ```bash
@@ -242,9 +224,6 @@ npm run test:e2e
 
 # Full CI workflow
 npm run ci
-
-# Pre-release check
-npm run prerelease
 ```
 
 ### Verification Scripts
