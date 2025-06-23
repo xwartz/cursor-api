@@ -1,0 +1,61 @@
+{
+  "name": "cursor-api",
+  "version": "1.0.0",
+  "description": "TypeScript library for the Cursor API",
+  "keywords": [
+    "cursor",
+    "ai",
+    "typescript",
+    "sdk",
+    "api",
+    "client"
+  ],
+  "author": "xwartz",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xwartz/cursor-api"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:proto": "protoc --plugin=protoc-gen-ts_proto=../../node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/lib --proto_path=./proto ./proto/*.proto",
+    "dev": "tsx watch examples/basic.ts",
+    "verify": "tsx scripts/verify.ts",
+    "verify:build": "tsx scripts/verify-build.ts",
+    "debug": "tsx scripts/debug-auth.ts",
+    "type-check": "tsc --noEmit",
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch --detectOpenHandles",
+    "test:coverage": "jest --coverage --detectOpenHandles --selectProjects unit",
+    "test:e2e": "jest --detectOpenHandles --selectProjects e2e",
+    "test:unit": "jest --detectOpenHandles --selectProjects unit",
+    "prerelease": "tsx scripts/pre-release-check.ts"
+  },
+  "dependencies": {
+    "protobufjs": "^7.4.0",
+    "semver": "^7.6.0",
+    "uuid": "^11.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

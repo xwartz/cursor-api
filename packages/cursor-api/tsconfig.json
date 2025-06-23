@@ -30,6 +30,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["src/**/*", "scripts/**/*", "examples"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": ["src/**/*", "scripts/**/*", "examples", "e2e/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

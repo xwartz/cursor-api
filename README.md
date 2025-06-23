@@ -1,93 +1,96 @@
-# Cursor API
+# Cursor API Monorepo
 
-[![npm version](https://badge.fury.io/js/cursor-api.svg)](https://badge.fury.io/js/cursor-api)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+This repository contains TypeScript libraries and tools for working with the Cursor API.
+
 [![CI](https://github.com/xwartz/cursor-api/workflows/CI/badge.svg)](https://github.com/xwartz/cursor-api/actions)
-[![codecov](https://codecov.io/gh/xwartz/cursor-api/graph/badge.svg?token=FKF3XOSSR2)](https://codecov.io/gh/xwartz/cursor-api)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
 
-TypeScript SDK for Cursor API, providing seamless integration with Cursor's AI capabilities.
+## Packages
 
-## Features
+This monorepo contains the following packages:
 
-- 🔥 **Full TypeScript Support** - Complete type safety and excellent developer experience
-- 🚀 **OpenAI Compatible** - Drop-in replacement for OpenAI SDK in most cases
-- 📡 **Streaming Support** - Real-time streaming responses with async iterators
-- 🔄 **Automatic Retries** - Built-in retry logic with exponential backoff
-- 🔐 **Secure Authentication** - API key and checksum-based authentication
-- 🧪 **Comprehensive Testing** - 100% test coverage with Jest
-- 📦 **Modern ESM/CJS** - Supports both ESM and CommonJS
+- [`cursor-api`](./packages/cursor-api/README.md): TypeScript library for interacting with the Cursor API
+- [`cursor-cli`](./packages/cursor-cli/README.md): CLI tools for Cursor IDE
 
-## Quick Start
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm 8+
 
 ### Installation
 
 ```bash
-npm install cursor-api
+# Clone the repository
+git clone https://github.com/xwartz/cursor-api.git
+cd cursor-api
+
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
 ```
 
-### Basic Usage
+### Development Workflow
 
-```typescript
-import { Cursor } from 'cursor-api'
+```bash
+# Run tests
+pnpm test
 
-const cursor = new Cursor({
-  apiKey: 'your-cursor-session-token',
-  checksum: 'your-cursor-checksum',
-})
+# Run linting
+pnpm lint
 
-const completion = await cursor.chat.completions.create({
-  model: 'gpt-4o',
-  messages: [{ role: 'user', content: 'Hello!' }],
-})
+# Run type checking
+pnpm type-check
+
+# Extract Cursor token
+pnpm get-token
 ```
 
-### Streaming
+## Project Structure
 
-```typescript
-const stream = await cursor.chat.completions.create({
-  model: 'gpt-4o',
-  messages: [{ role: 'user', content: 'Tell me a story' }],
-  stream: true,
-})
-
-for await (const chunk of stream) {
-  const content = chunk.choices[0]?.delta.content
-  if (content) process.stdout.write(content)
-}
 ```
-
-## Supported Models
-
-| Model                                                   | Streaming | Description             |
-| ------------------------------------------------------- | --------- | ----------------------- |
-| `claude-4-sonnet`, `claude-3.7-sonnet`, `claude-4-opus` | ✅        | Anthropic Claude models |
-| `gpt-4.1`, `gpt-4o`, `gpt-4o-mini`                      | ✅        | OpenAI GPT models       |
-| `deepseek-r1`, `deepseek-v3`                            | ✅        | DeepSeek models         |
-
-## Documentation
-
-- 📚 [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
-- 🔐 [Authentication Guide](./docs/AUTHENTICATION.md) - How to extract credentials from Cursor IDE
-- 📖 [API Reference](./docs/API_REFERENCE.md) - Complete API documentation
-- 💡 [Examples](./docs/EXAMPLES.md) - Code examples and integration patterns
-- ❓ [FAQ](./docs/FAQ.md) - Frequently asked questions and troubleshooting
-- 🧪 [Verification Guide](./docs/VERIFICATION.md) - Testing and debugging tools
-- 👥 [Contributing](./CONTRIBUTING.md) - Development and contribution guidelines
+cursor-api/
+├── packages/
+│   ├── cursor-api/        # Main API library
+│   └── cursor-cli/        # CLI tools
+├── e2e/                   # End-to-end tests
+└── .github/               # GitHub workflows
+```
 
 ## Contributing
 
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please make sure your code passes all tests, linting, and type checking before submitting a PR.
+
+## Publishing
+
+Packages are published to npm using the following workflow:
+
+1. Changes are merged to the `main` branch
+2. The CI/CD pipeline runs tests and builds the packages
+3. Packages are published to npm with the appropriate version
+
+To manually publish packages:
+
+```bash
+# Publish all packages
+pnpm run release
+
+# Publish a specific package
+cd packages/cursor-cli
+pnpm publish
+```
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- 📖 [Documentation](./docs/README.md)
-- 🐛 [Issues](https://github.com/xwartz/cursor-api/issues)
-- 💬 [Discussions](https://github.com/xwartz/cursor-api/discussions)
-
----
-
-Made with ❤️ by xwartz
+MIT

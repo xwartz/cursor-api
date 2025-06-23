@@ -1,0 +1,42 @@
+{
+  "name": "cursor-cli",
+  "version": "1.0.0",
+  "description": "CLI tools for Cursor IDE",
+  "author": "xwartz",
+  "license": "MIT",
+  "bin": {
+    "cursor-cli": "./bin/index.js"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "build": "tsup src/index.ts --format cjs --out-dir bin --target node18 --minify --clean",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.1.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "keywords": [
+    "cursor",
+    "cli",
+    "token",
+    "authentication"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xwartz/cursor-api",
+    "directory": "packages/cursor-cli"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

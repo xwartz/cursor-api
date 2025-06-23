@@ -6,18 +6,67 @@
  */
 
 import { Cursor } from '../src/index'
+import { execSync } from 'child_process'
+import { join } from 'path'
 
 interface DebugConfig {
   apiKey: string | undefined
   checksum: string | undefined
 }
 
+/**
+ * Get authentication credentials using cursor-cli
+ */
+function getCredentialsFromCli(): { apiKey: string; checksum: string } | null {
+  try {
+    console.log('🔑 Trying to get credentials from cursor-cli...')
+    // Get the path to the cursor-cli package
+    const cliPath = join(__dirname, '../../../packages/cursor-cli')
+
+    // Run the cursor-cli token command
+    const output = execSync('pnpm start -- token', {
+      cwd: cliPath,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      encoding: 'utf-8',
+    })
+
+    // Extract token and checksum from output
+    const tokenMatch = output.match(/Token: ([^\n]+)/)
+    const checksumMatch = output.match(/Checksum: ([^\n]+)/)
+
+    if (tokenMatch && checksumMatch) {
+      const apiKey = tokenMatch[1]?.trim() ?? ''
+      const checksum = checksumMatch[1]?.trim() ?? ''
+      console.log('✅ Successfully retrieved credentials from cursor-cli')
+      return { apiKey, checksum }
+    }
+
+    return null
+  } catch (error) {
+    console.error('❌ Failed to get credentials from cursor-cli:', error)
+    return null
+  }
+}
+
 async function debugAuth(): Promise<void> {
   console.log('🔍 Cursor API Authentication Debug Tool\n')
 
+  let apiKey = process.env['CURSOR_API_KEY']
+  let checksum = process.env['CURSOR_CHECKSUM']
+
+  // If environment variables are not set, try to get credentials from cursor-cli
+  if (!apiKey || !checksum) {
+    console.log('⚠️ Missing environment variables, trying cursor-cli...')
+    const credentials = getCredentialsFromCli()
+    if (credentials) {
+      apiKey = credentials.apiKey
+      checksum = credentials.checksum
+    }
+  }
+
   const config: DebugConfig = {
-    apiKey: process.env['CURSOR_API_KEY'],
-    checksum: process.env['CURSOR_CHECKSUM'],
+    apiKey,
+    checksum,
   }
 
   // Check environment variables
@@ -35,10 +84,12 @@ async function debugAuth(): Promise<void> {
       console.log('  - CURSOR_CHECKSUM environment variable not set')
     }
     console.log()
-    console.log('Please set these environment variables and try again.')
-    console.log(
-      'See docs/AUTHENTICATION.md for instructions on how to obtain these values.'
-    )
+    console.log('Please set these environment variables or install cursor-cli:')
+    console.log('1. Install cursor-cli: npm install -g cursor-cli')
+    console.log('2. Run: cursor-cli token')
+    console.log('3. Set environment variables:')
+    console.log('   export CURSOR_API_KEY="<token>"')
+    console.log('   export CURSOR_CHECKSUM="<checksum>"')
     process.exit(1)
   }
 
@@ -117,7 +168,7 @@ async function debugAuth(): Promise<void> {
 
   console.log('\n🎯 Debug Summary:')
   console.log('  - If authentication failed, double-check your credentials')
-  console.log('  - See docs/AUTHENTICATION.md for detailed setup instructions')
+  console.log('  - Try using cursor-cli to extract fresh credentials')
   console.log(
     '  - For further help, create an issue with the debug output above'
   )

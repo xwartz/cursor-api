@@ -1,6 +1,7 @@
 {
-  "name": "cursor-api",
+  "name": "cursor-api-monorepo",
   "version": "1.0.0",
+  "private": true,
   "description": "TypeScript library for the Cursor API",
   "keywords": [
     "cursor",
@@ -12,22 +13,6 @@
   ],
   "author": "xwartz",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "CHANGELOG.md",
-    "docs"
-  ],
   "engines": {
     "node": ">=18.0.0"
   },
@@ -36,36 +21,36 @@
     "url": "https://github.com/xwartz/cursor-api"
   },
   "scripts": {
-    "build": "tsup",
-    "build:verify": "npm run build && npm run verify:build",
-    "build:proto": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/lib --proto_path=./proto ./proto/*.proto",
-    "dev": "tsx watch examples/basic.ts",
-    "verify": "tsx scripts/verify.ts",
-    "verify:build": "tsx scripts/verify-build.ts",
-    "debug": "tsx scripts/debug-auth.ts",
-    "test": "jest --detectOpenHandles --selectProjects unit",
-    "test:watch": "jest --watch --detectOpenHandles --selectProjects unit",
-    "test:coverage": "jest --coverage --detectOpenHandles --selectProjects unit",
-    "test:e2e": "jest --detectOpenHandles --selectProjects e2e",
-    "test:unit": "jest --detectOpenHandles --selectProjects unit",
-    "test:all": "npm run test:unit && npm run test:e2e",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
-    "type-check": "tsc --noEmit",
-    "prepublishOnly": "npm run build:verify && npm run test:all",
-    "prerelease": "tsx scripts/pre-release-check.ts",
-    "release": "semantic-release",
-    "ci": "npm run lint && npm run type-check && npm run test:coverage && npm run build:verify",
-    "prepare": "husky || true"
-  },
-  "dependencies": {
-    "protobufjs": "^7.4.0",
-    "semver": "^7.6.0",
-    "uuid": "^11.0.3"
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "prerelease": "pnpm -r prerelease",
+    "release": "pnpm build && pnpm changeset publish",
+    "build": "pnpm -r build",
+    "build:verify": "pnpm run build && pnpm run verify:build",
+    "build:proto": "pnpm --filter=cursor-api build:proto",
+    "dev": "pnpm --filter=cursor-api dev",
+    "verify": "pnpm --filter=cursor-api verify",
+    "verify:build": "pnpm --filter=cursor-api verify:build",
+    "debug": "pnpm --filter=cursor-api debug",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm -r test:watch",
+    "test:coverage": "pnpm -r test:coverage",
+    "test:e2e": "pnpm -r test:e2e",
+    "test:unit": "pnpm -r test:unit",
+    "test:all": "pnpm run test:unit && pnpm run test:e2e",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
+    "type-check": "pnpm -r type-check",
+    "ci": "pnpm run lint && pnpm run type-check && pnpm run test:coverage && pnpm run build:verify",
+    "prepare": "husky || true",
+    "get-token": "pnpm --filter=cursor-cli start -- token"
   },
   "devDependencies": {
+    "@bufbuild/protobuf": "^2.5.2",
+    "@changesets/cli": "^2.29.5",
     "@types/jest": "^29.5.0",
     "@types/node": "^22.0.0",
     "@types/semver": "^7.5.0",
@@ -77,14 +62,14 @@
     "jest": "^29.7.0",
     "lint-staged": "^15.2.10",
     "prettier": "^3.4.0",
-    "semantic-release": "^24.0.0",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
+    "protobufjs": "^7.4.0",
+    "semver": "^7.6.0",
     "ts-jest": "^29.4.0",
     "ts-proto": "^2.0.0",
     "tsup": "^8.3.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "uuid": "^11.0.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -94,8 +79,5 @@
     "*.{json,md}": [
       "prettier --write"
     ]
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

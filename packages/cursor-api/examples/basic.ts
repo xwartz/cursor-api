@@ -1,4 +1,13 @@
-import { Cursor } from '../src/index'
+/**
+ * Basic example of using the Cursor API client
+ *
+ * This example demonstrates how to:
+ * 1. Initialize the client with authentication
+ * 2. Make a basic chat completion request
+ * 3. Make a streaming chat completion request
+ */
+
+import { Cursor } from '../src'
 import type { ChatCompletionChunk } from '../src/types/chat'
 
 async function basicExample(): Promise<void> {

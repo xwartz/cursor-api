@@ -5,7 +5,9 @@ Common issues, troubleshooting, and solutions for the Cursor API SDK.
 ## 🔐 Authentication Issues
 
 ### Q: My credentials stopped working suddenly
+
 **A:** Cursor credentials are session-based and expire when:
+
 - Cursor IDE restarts or updates
 - Session times out (usually 24-48 hours)
 - You sign out and back in
@@ -14,7 +16,9 @@ Common issues, troubleshooting, and solutions for the Cursor API SDK.
 **Solution**: Re-extract credentials using proxy tools. Set up monitoring to detect expired credentials.
 
 ### Q: I get SSL/TLS errors when using proxy tools
+
 **A:** This happens when intercepting HTTPS traffic:
+
 1. **Install proxy's SSL certificate** on your system
 2. **Trust the certificate** in OS certificate store
 3. **Configure SSL proxying** for `api2.cursor.sh` domain
@@ -23,7 +27,9 @@ Common issues, troubleshooting, and solutions for the Cursor API SDK.
 For Charles Proxy: Help → SSL Proxying → Install Charles Root Certificate
 
 ### Q: Proxy shows no traffic from Cursor IDE
+
 **A:** Try these solutions:
+
 - **Check proxy port** (usually 8888 for Charles)
 - **Configure system proxy** in OS network settings
 - **Disable other VPNs/proxies** that might interfere
@@ -31,12 +37,15 @@ For Charles Proxy: Help → SSL Proxying → Install Charles Root Certificate
 - **Run Cursor as administrator** on Windows
 
 ### Q: Can I automate credential extraction?
+
 **A:** Currently no. Cursor doesn't provide an API for credential access. You must manually extract them using network interception tools.
 
 ## 🚨 Runtime Errors
 
 ### Q: "fetch is not available" error in Node.js
+
 **A:** Happens in Node.js < 18. Solutions:
+
 ```typescript
 // Option 1: Upgrade to Node.js 18+
 node --version
@@ -51,24 +60,31 @@ const cursor = new Cursor({
 ```
 
 ### Q: Streaming stops mid-response
+
 **A:** Common causes and fixes:
+
 - **Network timeout**: Increase timeout values
 - **Proxy interference**: Try direct connection
 - **Memory issues**: Process chunks immediately, don't buffer
 - **Connection drops**: Implement reconnection logic
 
 ```typescript
-const stream = await cursor.chat.completions.create({
-  model: 'gpt-4',
-  messages: messages,
-  stream: true,
-}, {
-  timeout: 120000, // Longer timeout for streaming
-})
+const stream = await cursor.chat.completions.create(
+  {
+    model: 'gpt-4',
+    messages: messages,
+    stream: true,
+  },
+  {
+    timeout: 120000, // Longer timeout for streaming
+  }
+)
 ```
 
 ### Q: Getting "Invalid model" errors
+
 **A:** Model availability changes. Current working models:
+
 - `gpt-4` (most reliable)
 - `claude-3-5-sonnet-20241022`
 - `gpt-4o`, `gpt-4o-mini`
@@ -76,7 +92,9 @@ const stream = await cursor.chat.completions.create({
 Avoid deprecated models like `gpt-3.5-turbo` or old Claude versions.
 
 ### Q: High memory usage with streaming
+
 **A:** Process chunks immediately instead of accumulating:
+
 ```typescript
 // ❌ Don't do this
 let fullResponse = ''
@@ -96,14 +114,18 @@ for await (const chunk of stream) {
 ## 🌐 Network & Connectivity
 
 ### Q: Requests fail behind corporate firewall
+
 **A:** Corporate networks often block AI APIs:
+
 1. **Whitelist domains**: `api2.cursor.sh`, `*.cursor.sh`
 2. **Configure proxy**: Use corporate proxy settings
 3. **Check ports**: Ensure HTTPS (443) is allowed
 4. **Contact IT**: Request access to Cursor API endpoints
 
 ### Q: Intermittent connection failures
+
 **A:** Implement robust retry logic:
+
 ```typescript
 async function retryRequest(fn: () => Promise<any>, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
@@ -118,7 +140,9 @@ async function retryRequest(fn: () => Promise<any>, maxRetries = 3) {
 ```
 
 ### Q: Slow response times
+
 **A:** Optimization strategies:
+
 - **Use faster models**: `gpt-4o-mini` vs `gpt-4`
 - **Reduce max_tokens**: Limit response length
 - **Enable streaming**: Better perceived performance
@@ -128,9 +152,11 @@ async function retryRequest(fn: () => Promise<any>, maxRetries = 3) {
 ## 🔧 Development Issues
 
 ### Q: ESLint configuration errors after update
+
 **A:** We've migrated to ESLint 9.0 flat config format:
 
 **Old format (no longer supported):**
+
 ```javascript
 // .eslintrc.js (deprecated)
 module.exports = {
@@ -140,6 +166,7 @@ module.exports = {
 ```
 
 **New format (ESLint 9.0+):**
+
 ```javascript
 // eslint.config.js (required)
 const typescriptParser = require('@typescript-eslint/parser')
@@ -161,7 +188,9 @@ module.exports = [
 ```
 
 ### Q: TypeScript compilation errors
+
 **A:** We've updated to TypeScript 5.6. Common fixes:
+
 ```bash
 # Update TypeScript if using older version
 npm install -D typescript@^5.6.0
@@ -180,7 +209,9 @@ npm install -D typescript@^5.6.0
 ```
 
 ### Q: Jest test failures after dependency updates
+
 **A:** We've updated to Jest 30. Update your configuration:
+
 ```javascript
 // jest.config.js
 module.exports = {
@@ -188,15 +219,14 @@ module.exports = {
   testEnvironment: 'node',
   // Remove deprecated options if present
   // collectCoverageFrom updated syntax
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
 }
 ```
 
 ### Q: ESM vs CommonJS issues
+
 **A:** The SDK supports both, but mixing can cause issues:
+
 ```javascript
 // ESM (preferred)
 import { Cursor } from 'cursor-api'
@@ -206,24 +236,28 @@ const { Cursor } = require('cursor-api')
 ```
 
 For Next.js, add to `next.config.js`:
+
 ```javascript
 module.exports = {
   experimental: {
-    esmExternals: true
-  }
+    esmExternals: true,
+  },
 }
 ```
 
 ### Q: Dependency version conflicts
+
 **A:** We've updated major dependencies. If you encounter conflicts:
 
 **Updated versions:**
+
 - TypeScript: `^5.6.0`
 - ESLint: `^9.0.0`
 - Jest: `^30.0.0`
 - Node types: `^22.0.0`
 
 **Resolution:**
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules package-lock.json
@@ -239,7 +273,9 @@ npm install
 ```
 
 ### Q: Testing with mocked responses
+
 **A:** Mock the SDK for testing:
+
 ```typescript
 // Jest
 jest.mock('cursor-api', () => ({
@@ -247,23 +283,29 @@ jest.mock('cursor-api', () => ({
     chat: {
       completions: {
         create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: 'Mock response' } }]
-        })
-      }
-    }
-  }))
+          choices: [{ message: { content: 'Mock response' } }],
+        }),
+      },
+    },
+  })),
 }))
 ```
 
 ## 🏭 Production Issues
 
 ### Q: Rate limiting in production
+
 **A:** Implement proper rate limiting:
+
 ```typescript
 class RateLimiter {
   private requests = new Map<string, number[]>()
 
-  async checkLimit(key: string, limit: number, window: number): Promise<boolean> {
+  async checkLimit(
+    key: string,
+    limit: number,
+    window: number
+  ): Promise<boolean> {
     const now = Date.now()
     const requests = this.requests.get(key) || []
 
@@ -282,14 +324,18 @@ class RateLimiter {
 ```
 
 ### Q: Memory leaks in long-running applications
+
 **A:** Common causes and fixes:
+
 - **Unreleased stream readers**: Always call `reader.releaseLock()`
 - **Event listeners**: Remove listeners when done
 - **Large response caching**: Implement TTL and size limits
 - **Circular references**: Be careful with conversation history
 
 ### Q: Monitoring and observability
+
 **A:** Add comprehensive logging:
+
 ```typescript
 const cursor = new Cursor({
   apiKey: process.env.CURSOR_API_KEY!,
@@ -297,15 +343,15 @@ const cursor = new Cursor({
   defaultHeaders: {
     'X-Request-ID': () => generateRequestId(),
     'X-App-Version': process.env.APP_VERSION,
-  }
+  },
 })
 
 // Log all requests
-cursor.on('request', (req) => {
+cursor.on('request', req => {
   console.log(`[${req.id}] ${req.method} ${req.url}`)
 })
 
-cursor.on('response', (res) => {
+cursor.on('response', res => {
   console.log(`[${res.requestId}] ${res.status} ${res.duration}ms`)
 })
 ```
@@ -313,7 +359,9 @@ cursor.on('response', (res) => {
 ## 🔍 Debugging Tools
 
 ### Q: How to enable verbose logging?
+
 **A:** Set environment variables:
+
 ```bash
 export DEBUG=cursor-api:*
 export NODE_ENV=development
@@ -321,7 +369,9 @@ npm run your-app
 ```
 
 ### Q: Testing connectivity without making API calls
+
 **A:** Use the built-in verification:
+
 ```bash
 export CURSOR_API_KEY="your-key"
 export CURSOR_CHECKSUM="your-checksum"
@@ -329,7 +379,9 @@ npm run verify
 ```
 
 ### Q: Inspecting raw HTTP requests
+
 **A:** Use a debugging proxy:
+
 ```typescript
 const cursor = new Cursor({
   apiKey: 'your-key',
@@ -339,7 +391,7 @@ const cursor = new Cursor({
     const response = await fetch(url, options)
     console.log('Response:', response.status, response.headers)
     return response
-  }
+  },
 })
 ```
 

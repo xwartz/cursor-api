@@ -7,17 +7,20 @@ Thank you for your interest in contributing to the Cursor API SDK! This document
 ### 1. Development Setup
 
 1. **Fork and clone the repository**
+
    ```bash
    git clone https://github.com/your-username/cursor-api.git
    cd cursor-api
    ```
 
 2. **Install dependencies**
+
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Set up your credentials**
+
    ```bash
    export CURSOR_API_KEY="your-extracted-api-key"
    export CURSOR_CHECKSUM="your-extracted-checksum"
@@ -25,29 +28,33 @@ Thank you for your interest in contributing to the Cursor API SDK! This document
 
 4. **Run tests to ensure everything works**
    ```bash
-   npm test
+   pnpm test
    ```
 
 ### 2. Development Workflow
 
 1. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Make your changes**
+
    - Write your code
    - Add tests
    - Update documentation
 
 3. **Test your changes**
+
    ```bash
-   npm run test
-   npm run type-check
-   npm run lint
+   pnpm run test
+   pnpm run type-check
+   pnpm run lint
    ```
 
 4. **Commit and push**
+
    ```bash
    git add .
    git commit -m "feat: your feature description"
@@ -122,6 +129,7 @@ module.exports = [
 ### Development Dependencies
 
 Current major versions:
+
 - **TypeScript**: `^5.6.0`
 - **ESLint**: `^9.0.0`
 - **Jest**: `^30.0.0`
@@ -130,7 +138,7 @@ Current major versions:
 
 ### Comments and Documentation
 
-```typescript
+````typescript
 /**
  * Creates a chat completion request
  *
@@ -152,7 +160,7 @@ async function createCompletion(
 ): Promise<ChatCompletion> {
   // Implementation
 }
-```
+````
 
 ## 🧪 Testing Guidelines
 
@@ -176,7 +184,9 @@ describe('New Feature', () => {
 
   test('should work correctly', async () => {
     // Arrange
-    const input = { /* test data */ }
+    const input = {
+      /* test data */
+    }
 
     // Act
     const result = await cursor.someMethod(input)
@@ -203,16 +213,16 @@ describe('New Feature', () => {
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run tests in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Run tests with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # Run specific test file
-npm test -- new-feature.test.ts
+pnpm test -- new-feature.test.ts
 ```
 
 ## 📚 Documentation Guidelines
@@ -248,20 +258,11 @@ Follow the [Conventional Commits](https://conventionalcommits.org/) specificatio
 # Features
 git commit -m "feat: add streaming support for chat completions"
 
-# Bug fixes
-git commit -m "fix: resolve authentication timeout issue"
+# Fixes
+git commit -m "fix: handle rate limit errors gracefully"
 
 # Documentation
-git commit -m "docs: update authentication guide"
-
-# Tests
-git commit -m "test: add tests for error handling"
-
-# Refactoring
-git commit -m "refactor: simplify client initialization"
-
-# Breaking changes
-git commit -m "feat!: change API interface for consistency"
+git commit -m "docs: update README with new examples"
 ```
 
 ### Branch Naming
@@ -282,25 +283,31 @@ git commit -m "feat!: change API interface for consistency"
 6. **Update Docs** - Update relevant documentation
 
 **PR Template:**
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Changes Made
+
 - [ ] Feature A implemented
 - [ ] Bug B fixed
 - [ ] Tests added
 - [ ] Documentation updated
 
 ## Testing
+
 - [ ] Unit tests pass
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 
 ## Breaking Changes
+
 List any breaking changes
 
 ## Additional Notes
+
 Any additional information
 ```
 
@@ -338,20 +345,24 @@ cursor-api/
 
 ```markdown
 ## Bug Description
+
 Clear description of the bug
 
 ## Steps to Reproduce
+
 1. Step one
 2. Step two
 3. Expected vs actual result
 
 ## Environment
+
 - OS: macOS/Windows/Linux
 - Node.js version:
 - SDK version:
 - Cursor IDE version:
 
 ## Additional Context
+
 Screenshots, error logs, etc.
 ```
 
@@ -391,36 +402,38 @@ Screenshots, error logs, etc.
 3. **Verify docs** - Check documentation updates
 4. **Test manually** - Try the changes locally
 
-## 🚢 Release Process
+## 🚀 Release Process
 
-### Version Numbering
+This project uses [Changesets](https://github.com/changesets/changesets) to manage releases. The release process is automated through GitHub Actions.
 
-We follow [Semantic Versioning](https://semver.org/):
+### How it Works
 
-- **PATCH** (1.0.1) - Bug fixes
-- **MINOR** (1.1.0) - New features (backward compatible)
-- **MAJOR** (2.0.0) - Breaking changes
+1.  **Add a Changeset**: When you make a change that should be included in the next release, you need to add a "changeset". This is a file that describes the change.
 
-### Release Checklist
+    ```bash
+    pnpm changeset
+    ```
 
-- [ ] All tests pass
-- [ ] Documentation updated
-- [ ] CHANGELOG.md updated
-- [ ] Version bumped
-- [ ] Git tag created
-- [ ] NPM package published
+    This command will prompt you to select the packages that have been changed, the type of change (major, minor, or patch), and to provide a description of the change.
 
-## 💬 Getting Help
+2.  **Commit the Changeset**: Commit the generated markdown file in the `.changeset` directory along with your code changes.
 
-### Communication Channels
+3.  **Create a Pull Request**: Push your changes and create a pull request. The Changesets bot will comment on the PR to confirm that a changeset has been included.
 
-- **GitHub Issues** - Bug reports and feature requests
-- **GitHub Discussions** - General questions and ideas
-- **Pull Request Comments** - Code-specific discussions
+4.  **Versioning and Publishing**: When your PR is merged into the `main` branch, the `changesets-action` will automatically:
+    - Create a "Version Packages" pull request that updates the versions of the changed packages and their changelogs.
+    - When the "Version Packages" PR is merged, the action will publish the new package versions to npm.
 
-### Code of Conduct
+## 🤝 Getting Help
 
-This project follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/). Please read and follow it.
+If you have questions or need help, please:
+
+- **Open an issue** for bug reports or feature requests
+- **Start a discussion** for general questions
+
+---
+
+Thank you for contributing!
 
 ## 🎉 Recognition
 
